@@ -1,0 +1,2 @@
+# markov-quiz
+nostr bot
