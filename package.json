@@ -1,0 +1,25 @@
+{
+  "name": "markov-quiz",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "budoux": "^0.6.3",
+    "commander": "^13.1.0",
+    "fs-extra": "^11.3.0",
+    "markov-strings": "^3.0.2",
+    "nostr-fetch": "^0.17.0",
+    "nostr-tools": "^2.10.4",
+    "readline-sync": "^1.4.10"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "typescript": "^5.7.3"
+  }
+}

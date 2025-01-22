@@ -1,0 +1,21 @@
+import Markov from 'markov-strings';
+import { NostrEvent } from './types';
+
+export const buildMarkovChain = (texts: string[]): Markov.MarkovChain => {
+  const markov = new Markov(texts, { stateSize: 2 });
+  markov.buildCorpus();
+  return markov;
+};
+
+export const generateSentence = (markov: Markov.MarkovChain, maxTries = 100): string => {
+  try {
+    const result = markov.generate({
+      maxTries,
+      filter: (result) => result.string.split(' ').length >= 3
+    });
+    return result.string;
+  } catch (error) {
+    console.error('マルコフ生成エラー:', error);
+    return '';
+  }
+};
