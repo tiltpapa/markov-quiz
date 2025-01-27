@@ -1,18 +1,27 @@
 import fs from 'fs-extra';
 import path from 'path';
-import { AllowedUsers, NostrEvent } from './types';
+import { AllowedUsers, UsedEmojis } from './types';
 import { getEventHash, signEvent } from 'nostr-tools';
 
 const DATA_DIR = path.join(__dirname, '../data');
 const ALLOWED_USERS_FILE = path.join(DATA_DIR, 'allowedUsers.json');
+const USED_EMOJIS_FILE = path.join(DATA_DIR, 'usedEmojis.json');
 
-export const loadAllowedUsers = async (): Promise<AllowedUsers> => {
+export const loadJson = async (filename: string) => {
   try {
-    const data = await fs.readFile(ALLOWED_USERS_FILE, 'utf-8');
+    const data = await fs.readFile(filename, 'utf-8');
     return JSON.parse(data);
   } catch (error) {
     return {};
   }
+};
+
+export const loadAllowedUsers = async (): Promise<AllowedUsers> => {
+  return loadJson(ALLOWED_USERS_FILE);
+};
+
+export const loadUsedEmojis = async (): Promise<UsedEmojis> => {
+  return loadJson(USED_EMOJIS_FILE);
 };
 
 export const saveAllowedUsers = async (users: AllowedUsers): Promise<void> => {
