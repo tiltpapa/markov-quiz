@@ -1,7 +1,8 @@
 import fs from 'fs-extra';
 import path from 'path';
 import { AllowedUsers, UsedEmojis } from './types';
-import { getEventHash, signEvent } from 'nostr-tools';
+import { EventTemplate, finalizeEvent, getEventHash, NostrEvent, SimplePool } from 'nostr-tools';
+import { hexToBytes } from '@noble/hashes/utils'
 
 const DATA_DIR = path.join(__dirname, '../data');
 const ALLOWED_USERS_FILE = path.join(DATA_DIR, 'allowedUsers.json');
@@ -33,35 +34,10 @@ export const loadKey = async (filename: string): Promise<string> => {
   return (await fs.readFile(filePath, 'utf-8')).trim();
 };
 
-export const publishEvent = async (privateKey: string, event: Partial<NostrEvent>): Promise<void> => {
-  const createdAt = Math.floor(Date.now() / 1000);
-  const fullEvent = {
-    ...event,
-    created_at: createdAt,
-  };
-
-  const eventHash = getEventHash(fullEvent);
-  const signedEvent = {
-    ...fullEvent,
-    id: eventHash,
-    sig: signEvent(fullEvent, privateKey),
-  };
-
-  const relays = ['wss://relay.damus.io', 'wss://relay.nostr.info'];
-  for (const relay of relays) {
-    try {
-      const response = await fetch(relay, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(['EVENT', signedEvent]),
-      });
-      if (response.ok) {
-        console.log(`イベントをリレー ${relay} に送信しました。`);
-      } else {
-        console.error(`リレー ${relay} への送信に失敗しました。ステータス: ${response.status}`);
-      }
-    } catch (error) {
-      console.error(`リレー ${relay} への接続エラー:`, error);
-    }
-  }
+export const publishEvent = async (privateKey: string, event: EventTemplate): Promise<void> => {
+  const sk = hexToBytes(privateKey);
+  const signedEvent = finalizeEvent(event, sk);
+  const relays = import.meta.env.PUBLISH_RELAY.split(' ');
+  const pool = new SimplePool();
+  await Promise.all(pool.publish(relays, signedEvent));
 };

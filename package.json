@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@noble/hashes": "^1.7.1",
     "budoux": "^0.6.3",
     "commander": "^13.1.0",
     "fs-extra": "^11.3.0",
