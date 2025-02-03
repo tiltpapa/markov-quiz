@@ -2,9 +2,15 @@
   "name": "markov-quiz",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "vite build",
+    "dev:generate": "vite generate --mode development",
+    "dev:announce": "vite announce --mode development",
+    "generate": "vite generate --mode production",
+    "announce": "vite announce --mode production",
+    "listen": "vite listen --mode production"
   },
   "keywords": [],
   "author": "",
