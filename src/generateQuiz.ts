@@ -29,7 +29,9 @@ const generateQuiz = async () => {
     return;
   }
 
-  // コンテンツを収集
+  // Markofに食わせる二次配列を作成
+  // sanitizeContentで不要な文字列を削除
+  // budouxでわかち書きする
   const contents = events
     .map((event) => sanitizeContent(event.content))
     .filter((content) => content.length > 0);
@@ -38,6 +40,8 @@ const generateQuiz = async () => {
     console.log('有効な投稿がありません。');
     return;
   }
+
+  // saveUsedEmojis
 
   // マルコフ連鎖の構築
   const markov = buildMarkovChain(contents);
@@ -64,6 +68,9 @@ const generateQuiz = async () => {
   await publishEvent(privateKey, quizEvent);
 
   console.log('クイズを生成し、投稿しました:', quizText);
+  
+  // publicKey.txtを保存
+
 };
 
 const sanitizeContent = (content: string): string => {
