@@ -29,6 +29,10 @@ export const saveAllowedUsers = async (users: AllowedUsers): Promise<void> => {
   await fs.writeFile(ALLOWED_USERS_FILE, JSON.stringify(users, null, 2), 'utf-8');
 };
 
+export const saveUsedEmojis = async (emojis: UsedEmojis): Promise<void> => {
+  await fs.writeFile(USED_EMOJIS_FILE, JSON.stringify(emojis, null, 2), 'utf-8');
+};
+
 export const loadKey = async (filename: string): Promise<string> => {
   const filePath = path.join(DATA_DIR, filename);
   return (await fs.readFile(filePath, 'utf-8')).trim();
