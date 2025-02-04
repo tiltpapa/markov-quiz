@@ -29,9 +29,6 @@ const generateQuiz = async () => {
     return;
   }
 
-  // Markofに食わせる二次配列を作成
-  // sanitizeContentで不要な文字列を削除
-  // budouxでわかち書きする
   const contents = events
     .map((event) => sanitizeContent(event.content))
     .filter((content) => content.length > 0);
@@ -43,27 +40,38 @@ const generateQuiz = async () => {
 
   // saveUsedEmojis
 
+  // Markofに食わせる二次配列を作成
+  // sanitizeContentで不要な文字列を削除
+  // budouxでわかち書きする
+
   // マルコフ連鎖の構築
   const markov = buildMarkovChain(contents);
-
-  // クイズ文を生成
-  const quizText = generateSentence(markov);
-
-  if (quizText.length === 0) {
-    console.log('クイズの生成に失敗しました。');
-    return;
+  // 例文を 3 つ生成（それぞれ generateSentence を実行）
+  const exampleSentences: string[] = [];
+  for (let i = 0; i < 3; i++) {
+    const sentence = generateSentence(markov);
+    if (sentence.length === 0) {
+      console.log('例文生成に失敗しました。');
+      return;
+    }
+    exampleSentences.push(sentence);
   }
 
-  // クイズを投稿
-  const privateKey = await loadKey('privateKey.txt');
-  const answerPublicKey = await loadKey('publicKey.txt');
+  // 投稿内容に3つの例文をまとめる
+  const quizContent = `クイズ: 次の投稿はどのユーザのものか？\n\n` + 
+                       exampleSentences.map((s, index) => `${index + 1}. ${s}`).join('\n');
 
-  const quizContent = `クイズ: 次の投稿はどのユーザのものか？\n${quizText}`;
+  // クイズ投稿用のイベント作成
   const quizEvent = {
     kind: 1,
     content: quizContent,
     tags: [],
+    created_at: Math.floor(Date.now / 1000)
   };
+
+  // クイズを投稿
+  const privateKey = await loadKey('privateKey.txt');
+  const answerPublicKey = await loadKey('publicKey.txt');
 
   await publishEvent(privateKey, quizEvent);
 
