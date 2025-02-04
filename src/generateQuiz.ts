@@ -5,6 +5,7 @@ import { buildMarkovChain, generateSentence } from './markov';
 import { NostrEvent } from 'nostr-tools';
 import fs from 'fs-extra';
 import path from 'path';
+import { matchAll } from 'nostr-tools/lib/types/nip30';
 
 const generateQuiz = async () => {
   const allowedUsers = await loadAllowedUsers();
@@ -43,17 +44,11 @@ const generateQuiz = async () => {
   // sanitizeContentで不要な文字列を削除
   // budouxでわかち書きする
 
-  // saveUsedEmojis
-  let usedEmojis: UsedEmojis;
-  events.forEach((event) => {
-    if(event.tags.length > 1){
-      event.tags.map((tag) => {
-        if(tag[0] === "emoji"){ 
-          usedEmojis[tag[1]] = tag[2];
-        }
-      })
-    }
-  });
+  // emojiタグを取り出す
+  const emojiTags = events.filter((event) => event.tags.length > 1)
+                    .flatMap((event) => event.tags)
+                    .filter((tag) => tag[0] === "emoji")
+  
 
   // マルコフ連鎖の構築
   const markov = buildMarkovChain(contents);
@@ -67,7 +62,15 @@ const generateQuiz = async () => {
     }
     exampleSentences.push(sentence);
   }
-
+  
+  const quizTags = [];
+  exampleSentences.forEach((sentence) => {
+    const emojiIterator = matchAll(sentence);
+    for (const emojiMatch of emojiIterator) {
+       const tag = emojiTags.filter((emojiTag) => emojiMatch.name === emojiTag[1]);
+       quizTags.push(tag);
+    }      
+  });
   // 投稿内容に3つの例文をまとめる
   const quizContent = `クイズ: 次の投稿はどのユーザのものか？\n\n` + 
                        exampleSentences.map((s, index) => `${index + 1}. ${s}`).join('\n');
