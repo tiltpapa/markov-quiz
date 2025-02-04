@@ -1,7 +1,8 @@
 import { loadAllowedUsers, loadKey, publishEvent } from './utils';
 import { fetchEvents } from 'nostr-fetch';
-import { NostrEvent } from './types';
+import { UsedEmojis } from './types';
 import { buildMarkovChain, generateSentence } from './markov';
+import { NostrEvent } from 'nostr-tools';
 import fs from 'fs-extra';
 import path from 'path';
 
@@ -38,11 +39,21 @@ const generateQuiz = async () => {
     return;
   }
 
-  // saveUsedEmojis
-
   // Markofに食わせる二次配列を作成
   // sanitizeContentで不要な文字列を削除
   // budouxでわかち書きする
+
+  // saveUsedEmojis
+  let usedEmojis: UsedEmojis;
+  events.forEach((event) => {
+    if(event.tags.length > 1){
+      event.tags.map((tag) => {
+        if(tag[0] === "emoji"){ 
+          usedEmojis[tag[1]] = tag[2];
+        }
+      })
+    }
+  });
 
   // マルコフ連鎖の構築
   const markov = buildMarkovChain(contents);
@@ -78,6 +89,8 @@ const generateQuiz = async () => {
   console.log('クイズを生成し、投稿しました:', quizText);
   
   // publicKey.txtを保存
+
+  // saveAllowUsers
 
 };
 
