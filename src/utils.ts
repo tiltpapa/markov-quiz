@@ -38,6 +38,11 @@ export const loadKey = async (filename: string): Promise<string> => {
   return (await fs.readFile(filePath, 'utf-8')).trim();
 };
 
+export const saveKey = async (filename: string, key: string): Promise<void> => {
+  const filePath = path.join(DATA_DIR, filename);
+  await fs.writeFile(filePath, key, 'utf-8');
+};
+
 export const publishEvent = async (privateKey: string, event: EventTemplate): Promise<void> => {
   const sk = hexToBytes(privateKey);
   const signedEvent = finalizeEvent(event, sk);

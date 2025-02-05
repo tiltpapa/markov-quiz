@@ -1,4 +1,4 @@
-import { loadAllowedUsers, loadKey, publishEvent } from './utils';
+import { loadAllowedUsers, loadKey, publishEvent, saveKey } from './utils';
 import { fetchEvents } from 'nostr-fetch';
 import { UsedEmojis } from './types';
 import { buildMarkovChain, generateSentence } from './markov';
@@ -97,7 +97,8 @@ const generateQuiz = async () => {
   console.log('クイズを生成し、投稿しました:', quizContent);
   
   // answerKey.txtを保存
-
+  await saveKey('answerKey.txt', randomUserId);
+  
   // saveAllowUsers
 
 };
