@@ -6,6 +6,7 @@ import { NostrEvent } from 'nostr-tools';
 import fs from 'fs-extra';
 import path from 'path';
 import { matchAll } from 'nostr-tools/lib/types/nip30';
+import { loadDefaultJapaneseParser } from 'budoux';
 
 const generateQuiz = async () => {
   const allowedUsers = await loadAllowedUsers();
@@ -30,26 +31,28 @@ const generateQuiz = async () => {
     console.log('選択したユーザの投稿が見つかりません。');
     return;
   }
-
+  
+  // sanitizeContentで不要な文字列を削除
+  // budouxでわかち書きする
+  const parser = loadDefaultJapaneseParser();
   const contents = events
     .map((event) => sanitizeContent(event.content))
-    .filter((content) => content.length > 0);
+    .filter((content) => content.length > 0)
+    .map((content) => {
+        const tokens = parser.parse(content);
+        return tokens.join(' ');
+    });
 
   if (contents.length === 0) {
     console.log('有効な投稿がありません。');
     return;
-  }
-
-  // Markofに食わせる二次配列を作成
-  // sanitizeContentで不要な文字列を削除
-  // budouxでわかち書きする
+  }  
 
   // emojiタグを取り出す
   const emojiTags = events.filter((event) => event.tags.length > 1)
                     .flatMap((event) => event.tags)
                     .filter((tag) => tag[0] === "emoji")
   
-
   // マルコフ連鎖の構築
   const markov = buildMarkovChain(contents);
   // 例文を 3 つ生成（それぞれ generateSentence を実行）
@@ -63,13 +66,13 @@ const generateQuiz = async () => {
     exampleSentences.push(sentence);
   }
   
-  const quizTags = [];
+  const quizTags: string[][] = [];
   exampleSentences.forEach((sentence) => {
     const emojiIterator = matchAll(sentence);
     for (const emojiMatch of emojiIterator) {
-       const tag = emojiTags.filter((emojiTag) => emojiMatch.name === emojiTag[1]);
-       quizTags.push(tag);
-    }      
+       const tags = emojiTags.filter((emojiTag) => emojiMatch.name === emojiTag[1]);
+       tags.forEach((tag) => quizTags.push(tag));
+    }
   });
   // 投稿内容に3つの例文をまとめる
   const quizContent = `クイズ: 次の投稿はどのユーザのものか？\n\n` + 
@@ -79,19 +82,18 @@ const generateQuiz = async () => {
   const quizEvent = {
     kind: 1,
     content: quizContent,
-    tags: [],
+    tags: quizTags,
     created_at: Math.floor(Date.now / 1000)
   };
 
   // クイズを投稿
   const privateKey = await loadKey('privateKey.txt');
-  const answerPublicKey = await loadKey('publicKey.txt');
 
   await publishEvent(privateKey, quizEvent);
 
-  console.log('クイズを生成し、投稿しました:', quizText);
+  console.log('クイズを生成し、投稿しました:', quizContent);
   
-  // publicKey.txtを保存
+  // answerKey.txtを保存
 
   // saveAllowUsers
 
