@@ -1,12 +1,12 @@
 import Markov from 'markov-strings';
 import { NostrEvent } from './types';
-
+/*
 export const buildMarkovChain = (texts: string[]): Markov.MarkovChain => {
   const markov = new Markov(texts, { stateSize: 2 });
   markov.buildCorpus();
   return markov;
 };
-
+*/
 export const generateSentence = (markov: Markov, maxTries = 100): string => {
   try {
     const result = markov.generate({
