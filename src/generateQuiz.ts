@@ -7,6 +7,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import { matchAll } from 'nostr-tools/lib/types/nip30';
 import { loadDefaultJapaneseParser } from 'budoux';
+import Markov from 'markov-strings';
 
 const generateQuiz = async () => {
   const allowedUsers = await loadAllowedUsers();
@@ -54,7 +55,9 @@ const generateQuiz = async () => {
                     .filter((tag) => tag[0] === "emoji")
   
   // マルコフ連鎖の構築
-  const markov = buildMarkovChain(contents);
+  const markov = new Markov({ stateSize: 2 });
+  markov.addData(contents);
+
   // 例文を 3 つ生成（それぞれ generateSentence を実行）
   const exampleSentences: string[] = [];
   for (let i = 0; i < 3; i++) {
@@ -63,7 +66,7 @@ const generateQuiz = async () => {
       console.log('例文生成に失敗しました。');
       return;
     }
-    exampleSentences.push(sentence);
+    exampleSentences.push(sentence.replace(' ',''));
   }
   
   const quizTags: string[][] = [];

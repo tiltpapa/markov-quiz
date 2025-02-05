@@ -7,7 +7,7 @@ export const buildMarkovChain = (texts: string[]): Markov.MarkovChain => {
   return markov;
 };
 
-export const generateSentence = (markov: Markov.MarkovChain, maxTries = 100): string => {
+export const generateSentence = (markov: Markov, maxTries = 100): string => {
   try {
     const result = markov.generate({
       maxTries,
