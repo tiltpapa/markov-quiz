@@ -1,6 +1,6 @@
 import { loadAllowedUsers, saveAllowedUsers, loadKey, publishEvent } from './utils';
-import { Event, relayInit, getPublicKey } from 'nostr-tools';
-import { AllowedUsers, NostrEvent } from './types';
+import { Event, relayInit, getPublicKey, NostrEvent } from 'nostr-tools';
+import { AllowedUsers } from './types';
 
 const LISTEN_RELAY_URL = 'wss://relay.damus.io'; // 使用するリレーを指定
 
@@ -8,14 +8,19 @@ const handleReply = async (event: Event, botPubkey: string, privateKey: string, 
   const userPubkey = event.pubkey;
   const content = event.content.trim().toLowerCase();
 
-  if (content === 'ok') {
-    allowedUsers[userPubkey] = true;
-    await saveAllowedUsers(allowedUsers);
-    // 返信メッセージ
-    const replyContent = 'あなたはクイズの許諾リストに追加されました！';
-    await sendReply(event, replyContent, privateKey);
-    console.log(`ユーザー ${userPubkey} を許諾リストに追加しました。`);
-  } else if (content === 'ng') {
+  if (content.slice(-2) === 'ok') {
+    if (allowedUsers[userPubkey]) {
+      const replyContent = 'あなたは既に許諾リストに含まれています。';
+      await sendReply(event, replyContent, privateKey);
+    } else {
+      allowedUsers[userPubkey] = new Date(0);
+      await saveAllowedUsers(allowedUsers);
+      // 返信メッセージ
+      const replyContent = 'あなたはクイズの許諾リストに追加されました！';
+      await sendReply(event, replyContent, privateKey);
+      console.log(`ユーザー ${userPubkey} を許諾リストに追加しました。`);
+    }
+  } else if (content.slice(-2) === 'ng') {
     if (allowedUsers[userPubkey]) {
       delete allowedUsers[userPubkey];
       await saveAllowedUsers(allowedUsers);
@@ -27,12 +32,12 @@ const handleReply = async (event: Event, botPubkey: string, privateKey: string, 
       await sendReply(event, replyContent, privateKey);
       console.log(`ユーザー ${userPubkey} は許諾リストに含まれていません。`);
     }
-  } else {
+  }/* else {
     // 無効なコマンドに対する返信
     const replyContent = '許諾リストの管理には「OK」または「NG」とリプライしてください。';
     await sendReply(event, replyContent, privateKey);
     console.log(`ユーザー ${userPubkey} から無効なコマンドを受信しました。`);
-  }
+  }*/
 };
 
 const sendReply = async (event: Event, content: string, privateKey: string) => {
