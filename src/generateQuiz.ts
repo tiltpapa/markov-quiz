@@ -1,4 +1,4 @@
-import { loadAllowedUsers, loadKey, publishEvent, saveKey } from './utils';
+import { loadAllowedUsers, loadKey, publishEvent, saveAllowedUsers, saveKey } from './utils';
 import { fetchEvents } from 'nostr-fetch';
 import { UsedEmojis } from './types';
 import { buildMarkovChain, generateSentence } from './markov';
@@ -19,8 +19,17 @@ const generateQuiz = async () => {
   }
 
   // ランダムにユーザを選択
-  const randomUserId = userIds[Math.floor(Math.random() * userIds.length)];
-
+  let randomUserId: string;
+  const day3ago = new Date(); // 3日前
+  day3ago.setDate(day3ago.getDate() - 3);
+  for (let i = 0; i < 5; i++) {
+    randomUserId = userIds[Math.floor(Math.random() * userIds.length)];
+    if (allowedUsers[randomUserId] < day3ago) {
+      break;
+    } else {
+      console.log(`このユーザ(${randomUserId})は${allowedUsers[randomUserId].toLocaleString("ja")}にクイズになっています`);
+    }
+  }
   // イベントを取得
   const events: NostrEvent[] = await fetchEvents({
     kinds: [1],
@@ -98,8 +107,10 @@ const generateQuiz = async () => {
   
   // answerKey.txtを保存
   await saveKey('answerKey.txt', randomUserId);
-  
+
   // saveAllowUsers
+  allowedUsers[randomUserId] = new Date();
+  await saveAllowedUsers(allowedUsers);
 
 };
 
