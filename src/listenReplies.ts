@@ -1,10 +1,10 @@
 import { loadAllowedUsers, saveAllowedUsers, loadKey, publishEvent } from './utils';
-import { Event, relayInit, getPublicKey, NostrEvent } from 'nostr-tools';
+import { Event, relayInit, getPublicKey, NostrEvent, Relay } from 'nostr-tools';
 import { AllowedUsers } from './types';
 
 const LISTEN_RELAY_URL = 'wss://relay.damus.io'; // 使用するリレーを指定
 
-const handleReply = async (event: Event, botPubkey: string, privateKey: string, allowedUsers: AllowedUsers) => {
+const handleReply = async (event: Event, privateKey: string, allowedUsers: AllowedUsers) => {
   const userPubkey = event.pubkey;
   const content = event.content.trim().toLowerCase();
 
@@ -52,33 +52,28 @@ const sendReply = async (event: Event, content: string, privateKey: string) => {
 const listenReplies = async () => {
   const allowedUsers = await loadAllowedUsers();
   const privateKey = await loadKey('privateKey.txt');
+  // privateKeyを一旦arrayにする
   const botPubkey = getPublicKey(privateKey);
 
-  const relay = relayInit(LISTEN_RELAY_URL);
-  relay.on('connect', () => {
-    console.log(`接続中: ${LISTEN_RELAY_URL}`);
-    // ボット宛てのリプライを購読
-    const sub = relay.sub([
-      {
-        kinds: [1],
-        '#p': [botPubkey],
-      },
-    ]);
+  const relay = await Relay.connect(LISTEN_RELAY_URL);
 
-    sub.on('event', async (event: Event) => {
-      await handleReply(event, botPubkey, privateKey, allowedUsers);
-    });
-
-    sub.on('eose', () => {
+  // ボット宛てのリプライを購読
+  const sub = relay.subscribe([
+    {
+      kinds: [1],
+      '#p': [botPubkey],
+    },
+  ], {
+    onevent(event) {
+      handleReply(event, privateKey, allowedUsers);
+    },
+    oneose() {
       console.log('購読終了（End of Stored Events）。');
-    });
+      sub.close();
+    }
   });
 
-  relay.on('error', () => {
-    console.error(`リレー ${LISTEN_RELAY_URL} への接続に失敗しました。`);
-  });
-
-  await relay.connect();
+  relay.close();
 };
 
 export default listenReplies;
