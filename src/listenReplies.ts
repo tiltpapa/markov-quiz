@@ -1,6 +1,7 @@
-import { loadAllowedUsers, saveAllowedUsers, loadKey, publishEvent } from './utils';
-import { Event, relayInit, getPublicKey, NostrEvent, Relay } from 'nostr-tools';
+import { loadAllowedUsers, saveAllowedUsers, loadKey, publishEvent, saveKey } from './utils';
+import { Event, relayInit, getPublicKey, NostrEvent, Relay, Filter } from 'nostr-tools';
 import { AllowedUsers } from './types';
+import { hexToBytes } from '@noble/hashes/utils';
 
 const LISTEN_RELAY_URL = 'wss://relay.damus.io'; // 使用するリレーを指定
 
@@ -51,18 +52,29 @@ const sendReply = async (event: Event, content: string, privateKey: string) => {
 
 const listenReplies = async () => {
   const allowedUsers = await loadAllowedUsers();
+
   const privateKey = await loadKey('privateKey.txt');
-  // privateKeyを一旦arrayにする
-  const botPubkey = getPublicKey(privateKey);
+  const sk = hexToBytes(privateKey);
+  const botPubkey = getPublicKey(sk);
+  
+  // 最後にreqした日付を呼び出す
+  const filter: Filter = {
+    kinds: [1],
+    '#p': [botPubkey],
+  };
+  
+  try {
+    const lastSince = await loadKey('lastSince.txt');
+    filter.since = Number(lastSince);
+  } catch (error) {
+    filter.since = Math.floor(new Date('2025/01/01').getTime() / 1000);
+  }
 
   const relay = await Relay.connect(LISTEN_RELAY_URL);
 
   // ボット宛てのリプライを購読
   const sub = relay.subscribe([
-    {
-      kinds: [1],
-      '#p': [botPubkey],
-    },
+    filter
   ], {
     onevent(event) {
       handleReply(event, privateKey, allowedUsers);
@@ -74,6 +86,10 @@ const listenReplies = async () => {
   });
 
   relay.close();
+
+  // 現在の日時記録
+  const now = Math.floor(Date.now / 1000);
+  await saveKey('lastSince.txt', String(now));
 };
 
 export default listenReplies;
