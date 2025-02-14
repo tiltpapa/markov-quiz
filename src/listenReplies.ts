@@ -42,10 +42,11 @@ const handleReply = async (event: Event, privateKey: string, allowedUsers: Allow
 };
 
 const sendReply = async (event: Event, content: string, privateKey: string) => {
-  const replyEvent: Partial<NostrEvent> = {
+  const replyEvent = {
     kind: 1,
     content: content,
     tags: [['e', event.id], ['p', event.pubkey]], // リプライ先のイベントとユーザーをタグ付け
+    created_at: Math.floor(Date.now / 1000)
   };
   await publishEvent(privateKey, replyEvent);
 };
