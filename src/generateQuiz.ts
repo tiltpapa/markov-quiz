@@ -2,10 +2,9 @@ import { LISTEN_RELAY, loadAllowedUsers, loadKey, publishEvent, saveAllowedUsers
 import { fetchEvents, NostrFetcher } from 'nostr-fetch';
 import { UsedEmojis } from './types';
 import { buildMarkovChain, generateSentence } from './markov';
-import { NostrEvent } from 'nostr-tools';
+import { nip30, NostrEvent } from 'nostr-tools';
 import fs from 'fs-extra';
 import path from 'path';
-import { matchAll } from 'nostr-tools/lib/types/nip30';
 import { loadDefaultJapaneseParser } from 'budoux';
 import Markov from 'markov-strings';
 
@@ -85,7 +84,7 @@ const generateQuiz = async () => {
   
   const quizTags: string[][] = [];
   exampleSentences.forEach((sentence) => {
-    const emojiIterator = matchAll(sentence);
+    const emojiIterator = nip30.matchAll(sentence);
     for (const emojiMatch of emojiIterator) {
        const tags = emojiTags.filter((emojiTag) => emojiMatch.name === emojiTag[1]);
        tags.forEach((tag) => quizTags.push(tag));
