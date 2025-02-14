@@ -1,5 +1,4 @@
 import { Command } from 'commander';
-import manageList from './manageList';
 import generateQuiz from './generateQuiz';
 import announceAnswer from './announceAnswer';
 import listenReplies from './listenReplies';
