@@ -56,6 +56,14 @@ const listenReplies = async () => {
   const privateKey = await loadKey('privateKey.txt');
   const sk = hexToBytes(privateKey);
   const botPubkey = getPublicKey(sk);
+
+  const noticeEvent = {
+    kind: 1,
+    content: 'これより許諾リストを整理します。',
+    tags: [],
+    created_at: Math.floor(Date.now / 1000)
+  };
+  await publishEvent(privateKey, noticeEvent);
   
   // 最後にreqした日付を呼び出す
   const filter: Filter = {
