@@ -2,7 +2,7 @@ import { LISTEN_RELAY, loadAllowedUsers, loadKey, publishEvent, saveAllowedUsers
 import { NostrFetcher } from 'nostr-fetch';
 import { generateSentence } from './markov';
 import { nip30, NostrEvent } from 'nostr-tools';
-import { loadDefaultJapaneseParser } from 'budoux';
+import { jaModel, Parser } from 'budoux';
 import Markov from 'markov-strings';
 
 const generateQuiz = async () => {
@@ -45,7 +45,7 @@ const generateQuiz = async () => {
   
   // sanitizeContentで不要な文字列を削除
   // budouxでわかち書きする
-  const parser = loadDefaultJapaneseParser();
+  const parser = new Parser(jaModel);
   const contents = events
     .map((event) => sanitizeContent(event.content))
     .filter((content) => content.length > 0)
