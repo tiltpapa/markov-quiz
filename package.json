@@ -6,11 +6,10 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "dev:generate": "vite generate --mode development",
-    "dev:announce": "vite announce --mode development",
-    "generate": "vite generate --mode production",
-    "announce": "vite announce --mode production",
-    "listen": "vite listen --mode production"
+    "dev:build": "vite build --mode development",
+    "generate": "node dist/index.js generate",
+    "announce": "node dist/index.js announce",
+    "listen": "node dist/index.js listen"
   },
   "keywords": [],
   "author": "",
