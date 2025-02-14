@@ -3,7 +3,7 @@ import { Event, relayInit, getPublicKey, NostrEvent, Relay, Filter } from 'nostr
 import { AllowedUsers } from './types';
 import { hexToBytes } from '@noble/hashes/utils';
 
-const LISTEN_RELAY_URL = 'wss://relay.damus.io'; // 使用するリレーを指定
+const LISTEN_RELAY = import.meta.env.LISTEN_RELAY; // 使用するリレーを指定
 
 const handleReply = async (event: Event, privateKey: string, allowedUsers: AllowedUsers) => {
   const userPubkey = event.pubkey;
@@ -79,7 +79,7 @@ const listenReplies = async () => {
     filter.since = Math.floor(new Date('2025/01/01').getTime() / 1000);
   }
 
-  const relay = await Relay.connect(LISTEN_RELAY_URL);
+  const relay = await Relay.connect(LISTEN_RELAY);
 
   // ボット宛てのリプライを購読
   const sub = relay.subscribe([
