@@ -1,9 +1,7 @@
-import { loadAllowedUsers, saveAllowedUsers, loadKey, publishEvent, saveKey } from './utils';
+import { loadAllowedUsers, saveAllowedUsers, loadKey, publishEvent, saveKey, LISTEN_RELAY } from './utils';
 import { Event, relayInit, getPublicKey, NostrEvent, Relay, Filter } from 'nostr-tools';
 import { AllowedUsers } from './types';
 import { hexToBytes } from '@noble/hashes/utils';
-
-const LISTEN_RELAY = import.meta.env.LISTEN_RELAY; // 使用するリレーを指定
 
 const handleReply = async (event: Event, privateKey: string, allowedUsers: AllowedUsers) => {
   const userPubkey = event.pubkey;

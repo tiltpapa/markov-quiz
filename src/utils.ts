@@ -8,6 +8,8 @@ const DATA_DIR = path.join(__dirname, '../data');
 const ALLOWED_USERS_FILE = path.join(DATA_DIR, 'allowedUsers.json');
 const USED_EMOJIS_FILE = path.join(DATA_DIR, 'usedEmojis.json');
 
+export const LISTEN_RELAY = import.meta.env.LISTEN_RELAY;
+
 export const loadJson = async (filename: string) => {
   try {
     const data = await fs.readFile(filename, 'utf-8');

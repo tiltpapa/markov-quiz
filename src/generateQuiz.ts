@@ -1,5 +1,5 @@
-import { loadAllowedUsers, loadKey, publishEvent, saveAllowedUsers, saveKey } from './utils';
-import { fetchEvents } from 'nostr-fetch';
+import { LISTEN_RELAY, loadAllowedUsers, loadKey, publishEvent, saveAllowedUsers, saveKey } from './utils';
+import { fetchEvents, NostrFetcher } from 'nostr-fetch';
 import { UsedEmojis } from './types';
 import { buildMarkovChain, generateSentence } from './markov';
 import { NostrEvent } from 'nostr-tools';
@@ -31,11 +31,16 @@ const generateQuiz = async () => {
     }
   }
   // イベントを取得
-  const events: NostrEvent[] = await fetchEvents({
-    kinds: [1],
-    authors: [randomUserId],
-    limit: 1000 // なるべく長い期間の投稿を取得
-  });
+  const fetcher = NostrFetcher.init();
+  const relays = [LISTEN_RELAY];
+
+  const events: NostrEvent[] = await fetcher.fetchLatestEvents(
+    relays,
+    /* filter */
+    { kinds: [ 1 ], authors: [randomUserId] },
+    /* number of events to fetch */
+    10000,
+  );
 
   if (events.length === 0) {
     console.log('選択したユーザの投稿が見つかりません。');
