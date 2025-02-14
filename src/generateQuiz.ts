@@ -1,10 +1,7 @@
 import { LISTEN_RELAY, loadAllowedUsers, loadKey, publishEvent, saveAllowedUsers, saveKey } from './utils';
-import { fetchEvents, NostrFetcher } from 'nostr-fetch';
-import { UsedEmojis } from './types';
-import { buildMarkovChain, generateSentence } from './markov';
+import { NostrFetcher } from 'nostr-fetch';
+import { generateSentence } from './markov';
 import { nip30, NostrEvent } from 'nostr-tools';
-import fs from 'fs-extra';
-import path from 'path';
 import { loadDefaultJapaneseParser } from 'budoux';
 import Markov from 'markov-strings';
 

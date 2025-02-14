@@ -1,5 +1,5 @@
 import { loadAllowedUsers, saveAllowedUsers, loadKey, publishEvent, saveKey, LISTEN_RELAY } from './utils';
-import { Event, relayInit, getPublicKey, NostrEvent, Relay, Filter } from 'nostr-tools';
+import { Event, getPublicKey, Relay, Filter } from 'nostr-tools';
 import { AllowedUsers } from './types';
 import { hexToBytes } from '@noble/hashes/utils';
 

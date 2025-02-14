@@ -1,5 +1,4 @@
 import Markov from 'markov-strings';
-import { NostrEvent } from './types';
 /*
 export const buildMarkovChain = (texts: string[]): Markov.MarkovChain => {
   const markov = new Markov(texts, { stateSize: 2 });
