@@ -1,3 +1,7 @@
+export * from './types';
+export * from './utils';
+export * from './markov';
+
 import { Command } from 'commander';
 import generateQuiz from './generateQuiz';
 import announceAnswer from './announceAnswer';
