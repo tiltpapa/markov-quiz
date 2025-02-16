@@ -2,7 +2,8 @@
   "name": "markov-quiz",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "./dist/index.js",
+  "module": "./dist/index.umd.js",
   "type": "module",
   "scripts": {
     "build": "vite build",
@@ -10,6 +11,12 @@
     "generate": "node dist/index.js generate",
     "announce": "node dist/index.js announce",
     "listen": "node dist/index.js listen"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.umd.cjs"
+    }
   },
   "keywords": [],
   "author": "",
@@ -28,6 +35,7 @@
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.10.7",
     "typescript": "^5.7.3",
-    "vite": "^6.0.11"
+    "vite": "^6.0.11",
+    "vite-plugin-node-polyfills": "^0.23.0"
   }
 }

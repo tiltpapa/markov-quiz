@@ -1,10 +1,10 @@
-import fs from 'fs-extra';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import { AllowedUsers, UsedEmojis } from './types';
 import { EventTemplate, finalizeEvent, getEventHash, NostrEvent, SimplePool } from 'nostr-tools';
 import { hexToBytes } from '@noble/hashes/utils'
 
-const DATA_DIR = path.join(__dirname, '../data');
+const DATA_DIR = path.join(process.cwd(), 'data');
 const ALLOWED_USERS_FILE = path.join(DATA_DIR, 'allowedUsers.json');
 const USED_EMOJIS_FILE = path.join(DATA_DIR, 'usedEmojis.json');
 
