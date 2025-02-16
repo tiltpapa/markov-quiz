@@ -12,7 +12,7 @@ export const LISTEN_RELAY = import.meta.env.LISTEN_RELAY;
 
 export const loadJson = async (filename: string) => {
   try {
-    const data = await fs.readFile(filename, 'utf-8');
+    const data = fs.readFileSync(filename, 'utf-8');
     return JSON.parse(data);
   } catch (error) {
     return {};
@@ -28,7 +28,7 @@ export const loadUsedEmojis = async (): Promise<UsedEmojis> => {
 };
 */
 export const saveAllowedUsers = async (users: AllowedUsers): Promise<void> => {
-  await fs.writeFile(ALLOWED_USERS_FILE, JSON.stringify(users, null, 2), 'utf-8');
+  fs.writeFileSync(ALLOWED_USERS_FILE, JSON.stringify(users, null, 2), 'utf-8');
 };
 /*
 export const saveUsedEmojis = async (emojis: UsedEmojis): Promise<void> => {
@@ -37,12 +37,12 @@ export const saveUsedEmojis = async (emojis: UsedEmojis): Promise<void> => {
 */
 export const loadKey = async (filename: string): Promise<string> => {
   const filePath = path.join(DATA_DIR, filename);
-  return (await fs.readFile(filePath, 'utf-8')).trim();
+  return (fs.readFileSync(filePath, 'utf-8')).trim();
 };
 
 export const saveKey = async (filename: string, key: string): Promise<void> => {
   const filePath = path.join(DATA_DIR, filename);
-  await fs.writeFile(filePath, key, 'utf-8');
+  fs.writeFileSync(filePath, key, 'utf-8');
 };
 
 export const publishEvent = async (privateKey: string, event: EventTemplate): Promise<void> => {
