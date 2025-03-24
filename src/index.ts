@@ -1,11 +1,11 @@
-export * from './types';
-export * from './utils';
-export * from './markov';
+export * from './types.ts';
+export * from './utils.ts';
+export * from './markov.ts';
 
 import { Command } from 'commander';
-import generateQuiz from './generateQuiz';
-import announceAnswer from './announceAnswer';
-import listenReplies from './listenReplies';
+import generateQuiz from './generateQuiz.ts';
+import announceAnswer from './announceAnswer.ts';
+import listenReplies from './listenReplies.ts';
 
 const program = new Command();
 
@@ -30,4 +30,4 @@ program
     listenReplies();
   });
 
-program.parse(process.argv);
+program.parse(Deno.args);
