@@ -1,6 +1,6 @@
-import { loadAllowedUsers, saveAllowedUsers, loadKey, publishEvent, saveKey, LISTEN_RELAY } from './utils';
+import { loadAllowedUsers, saveAllowedUsers, loadKey, publishEvent, saveKey, LISTEN_RELAY } from './utils.ts';
 import { Event, getPublicKey, Relay, Filter } from 'nostr-tools';
-import { AllowedUsers } from './types';
+import { AllowedUsers } from './types.ts';
 import { hexToBytes } from '@noble/hashes/utils';
 
 const handleReply = async (event: Event, privateKey: string, allowedUsers: AllowedUsers) => {

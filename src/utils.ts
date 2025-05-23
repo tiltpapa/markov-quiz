@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { AllowedUsers, UsedEmojis } from './types';
+import { AllowedUsers, UsedEmojis } from './types.ts';
 import { EventTemplate, finalizeEvent, getEventHash, NostrEvent, SimplePool } from 'nostr-tools';
 import { hexToBytes } from '@noble/hashes/utils'
 

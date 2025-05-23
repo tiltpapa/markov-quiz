@@ -1,6 +1,6 @@
-import { LISTEN_RELAY, loadAllowedUsers, loadKey, publishEvent, saveAllowedUsers, saveKey } from './utils';
+import { LISTEN_RELAY, loadAllowedUsers, loadKey, publishEvent, saveAllowedUsers, saveKey } from './utils.ts';
 import { NostrFetcher } from 'nostr-fetch';
-import { generateSentence } from './markov';
+import { generateSentence } from './markov.ts';
 import { nip30, NostrEvent } from 'nostr-tools';
 import { jaModel, Parser } from 'budoux';
 import Markov from 'markov-strings';

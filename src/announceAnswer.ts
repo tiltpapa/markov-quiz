@@ -1,5 +1,5 @@
 import { nip19 } from 'nostr-tools';
-import { loadKey, publishEvent } from './utils';
+import { loadKey, publishEvent } from './utils.ts';
 
 const announceAnswer = async () => {
   const privateKey = await loadKey('privateKey.txt');
