@@ -1,0 +1,119 @@
+name: Nostr Quiz Bot
+
+on:
+  schedule:
+    # 毎日JST 9:00 (UTC 0:00) にクイズ生成
+    - cron: '0 0 * * *'
+    # 6時間おきにリプライ監視
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      action:
+        description: '実行するアクション'
+        required: true
+        default: 'generate'
+        type: choice
+        options:
+        - generate
+        - listen
+        - both
+
+jobs:
+  quiz-generate:
+    if: github.event_name == 'schedule' && github.event.schedule == '0 0 * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'generate' || github.event.inputs.action == 'both'))
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build bot
+        run: npm run build:bot
+
+      - name: Generate quiz
+        run: npm run bot:generate
+        env:
+          LISTEN_RELAY: ${{ vars.LISTEN_RELAY }}
+          PUBLISH_RELAYS: ${{ vars.PUBLISH_RELAYS }}
+
+      - name: Commit and push quiz data
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add static/data/quiz.json
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🎯 Update quiz data - $(date '+%Y-%m-%d %H:%M:%S')"
+            git push
+          fi
+
+  reply-listener:
+    if: github.event_name == 'schedule' && github.event.schedule == '0 */6 * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'listen' || github.event.inputs.action == 'both'))
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build bot
+        run: npm run build:bot
+
+      - name: Listen to replies
+        run: npm run bot:listen
+        env:
+          LISTEN_RELAY: ${{ vars.LISTEN_RELAY }}
+          PUBLISH_RELAYS: ${{ vars.PUBLISH_RELAYS }}
+
+      - name: Commit and push updated allowed users
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add data/
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "📝 Update allowed users - $(date '+%Y-%m-%d %H:%M:%S')"
+            git push
+          fi
+
+  # Nostrイベント投稿
+  post-to-nostr:
+    if: github.event_name == 'schedule' && github.event.schedule == '0 0 * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'generate' || github.event.inputs.action == 'both'))
+    needs: quiz-generate
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Post quiz to Nostr
+        uses: snow-actions/nostr@v1.8.1
+        with:
+          relays: ${{ vars.PUBLISH_RELAYS }}
+          private-key: ${{ secrets.NOSTR_PRIVATE_KEY }}
+          content: |
+            🎯 新しいマルコフ連鎖クイズが出題されました！
+            
+            GitHub Pages でチャレンジしてみてください:
+            https://tiltpapa.github.io/markov-quiz/
+            
+            問題に挑戦したい方は "OK" とリプライ
+            参加を停止したい方は "NG" とリプライ
+            
+            #nostr #quiz #マルコフ連鎖 

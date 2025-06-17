@@ -1,16 +1,18 @@
-import { resolve } from 'path'
 import { defineConfig } from 'vite'
+import { svelte } from '@sveltejs/vite-plugin-svelte'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 export default defineConfig({
-  build: {
-    lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
-      name: 'index',
-      fileName: 'index',
-    },
-  },
   plugins: [
+    svelte(),
     nodePolyfills()
-  ]
+  ],
+  base: '/markov-quiz/',
+  build: {
+    outDir: 'dist/web',
+    emptyOutDir: true,
+  },
+  server: {
+    port: 3000
+  }
 })

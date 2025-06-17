@@ -1,0 +1,10 @@
+{
+  "questions": [
+    "今日も一日お疲れ様でした",
+    "明日は晴れるといいですね",
+    "みなさんはどう思いますか"
+  ],
+  "correctUserId": "sample_user_id_1234567890abcdef",
+  "createdAt": 1640995200000,
+  "emojiTags": []
+} 
