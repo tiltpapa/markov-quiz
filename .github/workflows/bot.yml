@@ -43,12 +43,13 @@ jobs:
         env:
           LISTEN_RELAY: ${{ vars.LISTEN_RELAY }}
           PUBLISH_RELAYS: ${{ vars.PUBLISH_RELAYS }}
+          NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
 
       - name: Commit and push quiz data
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add static/data/quiz.json
+          git add static/data/
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
@@ -80,16 +81,17 @@ jobs:
         env:
           LISTEN_RELAY: ${{ vars.LISTEN_RELAY }}
           PUBLISH_RELAYS: ${{ vars.PUBLISH_RELAYS }}
+          NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
 
-      - name: Commit and push updated allowed users
+      - name: Commit and push updated data
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add data/
+          git add static/data/
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "📝 Update allowed users - $(date '+%Y-%m-%d %H:%M:%S')"
+            git commit -m "📝 Update allowed users and last sync - $(date '+%Y-%m-%d %H:%M:%S')"
             git push
           fi
 

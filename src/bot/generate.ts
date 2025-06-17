@@ -1,5 +1,5 @@
 import { generateQuizData } from '../lib/quiz.ts';
-import { loadAllowedUsers, saveAllowedUsers, LISTEN_RELAY } from '../lib/nostr.ts';
+import { loadAllowedUsers, saveAllowedUsers, LISTEN_RELAY, getPrivateKey } from '../lib/nostr.ts';
 import fs from 'fs';
 import path from 'path';
 

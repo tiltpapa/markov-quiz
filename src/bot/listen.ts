@@ -1,4 +1,4 @@
-import { loadAllowedUsers, saveAllowedUsers, loadKey, saveKey, LISTEN_RELAY, sendReply, getBotPublicKey, connectToRelay } from '../lib/nostr.ts';
+import { loadAllowedUsers, saveAllowedUsers, loadLastSince, saveLastSince, LISTEN_RELAY, sendReply, getBotPublicKey, connectToRelay, getPrivateKey } from '../lib/nostr.ts';
 import { Event, Filter } from 'nostr-tools';
 import { AllowedUsers } from '../lib/types.ts';
 
@@ -35,7 +35,7 @@ const handleReply = async (event: Event, privateKey: string, allowedUsers: Allow
 
 export const listenReplies = async () => {
   const allowedUsers = await loadAllowedUsers();
-  const privateKey = await loadKey('privateKey.txt');
+  const privateKey = getPrivateKey(); // 環境変数から取得
   const botPubkey = getBotPublicKey(privateKey);
 
   // 許諾リスト整理開始の通知
@@ -47,14 +47,9 @@ export const listenReplies = async () => {
     '#p': [botPubkey],
   };
   
-  try {
-    const lastSince = await loadKey('lastSince.txt');
-    filter.since = Number(lastSince);
-    console.log(`前回取得時刻: ${new Date(Number(lastSince) * 1000).toLocaleString('ja')}`);
-  } catch (error) {
-    filter.since = Math.floor(new Date('2025/01/01').getTime() / 1000);
-    console.log('前回取得時刻が見つかりません。2025/01/01から開始します。');
-  }
+  const lastSince = await loadLastSince();
+  filter.since = lastSince;
+  console.log(`前回取得時刻: ${new Date(lastSince * 1000).toLocaleString('ja')}`);
 
   const relay = await connectToRelay(LISTEN_RELAY);
   console.log(`リレー ${LISTEN_RELAY} に接続しました。`);
@@ -76,6 +71,6 @@ export const listenReplies = async () => {
 
   // 現在の日時記録
   const now = Math.floor(Date.now() / 1000);
-  await saveKey('lastSince.txt', String(now));
+  await saveLastSince(now);
   console.log('許諾リスト整理が完了しました。');
 }; 
