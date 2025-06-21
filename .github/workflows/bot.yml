@@ -1,6 +1,11 @@
 name: Nostr Quiz Bot
 
 on:
+  push:
+    branches-ignore: [ main ]
+    paths:
+      - 'src/bot/**'
+      - 'src/lib/**'
   schedule:
     # 毎日JST 9:00 (UTC 0:00) にクイズ生成
     - cron: '0 0 * * *'
@@ -47,14 +52,57 @@ jobs:
 
       - name: Commit and push quiz data
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
           git add static/data/
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
             git commit -m "🎯 Update quiz data - $(date '+%Y-%m-%d %H:%M:%S')"
             git push
+          fi
+
+  # 開発ブランチ用のクイズ生成（ファイル表示のみ）
+  quiz-generate-dev:
+    if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build bot
+        run: npm run build:bot
+
+      - name: Generate quiz
+        run: npm run bot:generate
+        env:
+          LISTEN_RELAY: ${{ vars.LISTEN_RELAY }}
+          PUBLISH_RELAYS: ${{ vars.PUBLISH_RELAYS }}
+          NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
+
+      - name: Show generated quiz data
+        run: |
+          echo "=== Generated Quiz Data ==="
+          if [ -f static/data/quiz.json ]; then
+            echo "📊 Quiz data:"
+            head -20 static/data/quiz.json
+          fi
+          if [ -f static/data/allowedUsers.json ]; then
+            echo "👥 Allowed users:"
+            head -10 static/data/allowedUsers.json
+          fi
+          if [ -f static/data/lastSince.json ]; then
+            echo "⏰ Last sync:"
+            head -5 static/data/lastSince.json
           fi
 
   reply-listener:
@@ -85,8 +133,8 @@ jobs:
 
       - name: Commit and push updated data
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
           git add static/data/
           if git diff --staged --quiet; then
             echo "No changes to commit"
@@ -95,7 +143,7 @@ jobs:
             git push
           fi
 
-  # Nostrイベント投稿
+  # Nostrイベント投稿（mainブランチのみ）
   post-to-nostr:
     if: github.event_name == 'schedule' && github.event.schedule == '0 0 * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'generate' || github.event.inputs.action == 'both'))
     needs: quiz-generate

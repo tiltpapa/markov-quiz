@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, '**' ]
     paths:
       - 'src/app/**'
       - 'src/lib/**'
@@ -18,15 +18,24 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: "pages-${{ github.ref_name }}"
   cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      branch-name: ${{ steps.branch.outputs.name }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Get branch name
+        id: branch
+        run: |
+          BRANCH_NAME=${GITHUB_REF#refs/heads/}
+          echo "name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          echo "Branch: $BRANCH_NAME"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -39,6 +48,8 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          VITE_BASE_PATH: ${{ steps.branch.outputs.name == 'main' && '/markov-quiz/' || format('/markov-quiz/{0}/', steps.branch.outputs.name) }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -51,7 +62,7 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ needs.build.outputs.branch-name == 'main' && steps.deployment.outputs.page_url || format('{0}{1}/', steps.deployment.outputs.page_url, needs.build.outputs.branch-name) }}
     runs-on: ubuntu-latest
     needs: build
     steps:
