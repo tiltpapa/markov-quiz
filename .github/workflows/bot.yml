@@ -7,10 +7,10 @@ on:
       - 'src/bot/**'
       - 'src/lib/**'
   schedule:
-    # 毎日JST 9:00 (UTC 0:00) にクイズ生成
-    - cron: '0 0 * * *'
-    # 6時間おきにリプライ監視
-    - cron: '0 */6 * * *'
+    # JST 0:00 と 12:00 (UTC 15:00 と 3:00) にクイズ生成
+    - cron: '0 15,3 * * *'
+    # 1時間おきにリプライ監視（毎時55分に実行してクイズ生成より先に実行）
+    - cron: '55 * * * *'
   workflow_dispatch:
     inputs:
       action:
@@ -25,7 +25,7 @@ on:
 
 jobs:
   quiz-generate:
-    if: github.event_name == 'schedule' && github.event.schedule == '0 0 * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'generate' || github.event.inputs.action == 'both'))
+    if: github.event_name == 'schedule' && github.event.schedule == '0 15,3 * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'generate' || github.event.inputs.action == 'both'))
     runs-on: self-hosted
     steps:
       - name: Checkout repository
@@ -58,7 +58,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "🎯 Update quiz data - $(date '+%Y-%m-%d %H:%M:%S')"
+            git commit -m "Update quiz data - $(date '+%Y-%m-%d %H:%M:%S')"
             git push
           fi
 
@@ -93,20 +93,20 @@ jobs:
         run: |
           echo "=== Generated Quiz Data ==="
           if [ -f static/data/quiz.json ]; then
-            echo "📊 Quiz data:"
+            echo "Quiz data:"
             head -20 static/data/quiz.json
           fi
           if [ -f static/data/allowedUsers.json ]; then
-            echo "👥 Allowed users:"
+            echo "Allowed users:"
             head -10 static/data/allowedUsers.json
           fi
           if [ -f static/data/lastSince.json ]; then
-            echo "⏰ Last sync:"
+            echo "Last sync:"
             head -5 static/data/lastSince.json
           fi
 
   reply-listener:
-    if: github.event_name == 'schedule' && github.event.schedule == '0 */6 * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'listen' || github.event.inputs.action == 'both'))
+    if: github.event_name == 'schedule' && github.event.schedule == '55 * * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'listen' || github.event.inputs.action == 'both'))
     runs-on: self-hosted
     steps:
       - name: Checkout repository
@@ -139,13 +139,13 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "📝 Update allowed users and last sync - $(date '+%Y-%m-%d %H:%M:%S')"
+            git commit -m "Update allowed users and last sync - $(date '+%Y-%m-%d %H:%M:%S')"
             git push
           fi
 
   # Nostrイベント投稿（mainブランチのみ）
   post-to-nostr:
-    if: github.event_name == 'schedule' && github.event.schedule == '0 0 * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'generate' || github.event.inputs.action == 'both'))
+    if: github.event_name == 'schedule' && github.event.schedule == '0 15,3 * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'generate' || github.event.inputs.action == 'both'))
     needs: quiz-generate
     runs-on: self-hosted
     steps:
@@ -158,12 +158,11 @@ jobs:
           relays: ${{ vars.PUBLISH_RELAYS }}
           private-key: ${{ secrets.NOSTR_PRIVATE_KEY }}
           content: |
-            🎯 新しいマルコフ連鎖クイズが出題されました！
+            新しいマルコフ連鎖クイズが出題されました！
             
-            GitHub Pages でチャレンジしてみてください:
             https://tiltpapa.github.io/markov-quiz/
             
-            問題に挑戦したい方は "OK" とリプライ
-            参加を停止したい方は "NG" とリプライ
+            出題対象にしてもよいという方は "OK" とリプライ
+            出題対象にされたくないという方は "NG" とリプライ
             
-            #nostr #quiz #マルコフ連鎖 
+            #quiz #マルコフ連鎖 
