@@ -1,10 +1,10 @@
 import { NostrFetcher } from 'nostr-fetch';
-import { generateSentence } from './markov.ts';
+import { generateSentence } from './markov';
 import { nip30, NostrEvent } from 'nostr-tools';
 import { jaModel, Parser } from 'budoux';
 import Markov from 'markov-strings';
-import { UserData } from './types.ts';
-import { getRecentQuizUsers } from './nostr.ts';
+import { UserData } from './types';
+import { getRecentQuizUsers } from './nostr';
 
 export interface QuizData {
   questions: string[];
