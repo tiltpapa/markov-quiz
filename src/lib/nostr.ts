@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { AllowedUsers } from './types.ts';
+import { UserData } from './types.ts';
 import { EventTemplate, finalizeEvent, SimplePool, Event, getPublicKey, Relay, Filter } from 'nostr-tools';
 import { hexToBytes } from '@noble/hashes/utils';
 
@@ -25,28 +25,61 @@ export const getPrivateKey = (): string => {
 export const loadJson = async (filename: string) => {
   try {
     const data = fs.readFileSync(filename, 'utf-8');
-    return JSON.parse(data, (key, value) => {
-      // Date文字列をDateオブジェクトに変換
-      if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value)) {
-        return new Date(value);
-      }
-      return value;
-    });
+    return JSON.parse(data);
   } catch (error) {
     return {};
   }
 };
 
-export const loadAllowedUsers = async (): Promise<AllowedUsers> => {
-  return await loadJson(ALLOWED_USERS_FILE);
+export const loadUserData = async (): Promise<UserData> => {
+  const data = await loadJson(ALLOWED_USERS_FILE);
+  return {
+    allowedUsers: data.allowedUsers || {},
+    denyUsers: data.denyUsers || {}
+  };
 };
 
-export const saveAllowedUsers = async (users: AllowedUsers): Promise<void> => {
+export const saveUserData = async (userData: UserData): Promise<void> => {
   // static/dataディレクトリが存在しない場合は作成
   if (!fs.existsSync(STATIC_DATA_DIR)) {
     fs.mkdirSync(STATIC_DATA_DIR, { recursive: true });
   }
-  fs.writeFileSync(ALLOWED_USERS_FILE, JSON.stringify(users, null, 2), 'utf-8');
+  fs.writeFileSync(ALLOWED_USERS_FILE, JSON.stringify(userData, null, 2), 'utf-8');
+};
+
+// 過去問から使用されたユーザーを取得する関数
+export const getRecentQuizUsers = (): string[] => {
+  const files = fs.readdirSync(STATIC_DATA_DIR)
+    .filter(file => file.match(/^quiz_\d{12}\.json$/))
+    .sort((a, b) => b.localeCompare(a)) // 降順でソート（新しいファイルから）
+    .slice(0, 3); // 過去3問分
+
+  const recentUsers: string[] = [];
+  for (const file of files) {
+    try {
+      const filePath = path.join(STATIC_DATA_DIR, file);
+      const quizData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      if (quizData.correctUserId) {
+        recentUsers.push(quizData.correctUserId);
+      }
+    } catch (error) {
+      console.log(`クイズファイル読み込みエラー: ${file}`);
+    }
+  }
+  
+  return recentUsers;
+};
+
+// 現在の日時をファイル名形式で生成する関数
+export const generateQuizFileName = (): string => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const hour = String(now.getHours()).padStart(2, '0');
+  const minute = String(now.getMinutes()).padStart(2, '0');
+  
+  return `quiz_${year}${month}${day}${hour}${minute}.json`;
 };
 
 // lastSinceをJSON形式で管理

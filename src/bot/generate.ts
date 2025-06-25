@@ -1,23 +1,24 @@
 import { generateQuizData } from '../lib/quiz.ts';
-import { loadAllowedUsers, saveAllowedUsers, LISTEN_RELAY, getPrivateKey } from '../lib/nostr.ts';
+import { loadUserData, saveUserData, LISTEN_RELAY, getPrivateKey, generateQuizFileName } from '../lib/nostr.ts';
 import fs from 'fs';
 import path from 'path';
 
 export const generateQuizForBot = async () => {
   console.log('🎯 クイズ生成を開始します...');
   
-  // 許諾リストを読み込み
-  const allowedUsers = await loadAllowedUsers();
-  console.log(`📋 許諾リスト: ${Object.keys(allowedUsers).length}ユーザー`);
+  // ユーザーデータを読み込み
+  const userData = await loadUserData();
+  console.log(`📋 許諾リスト: ${Object.keys(userData.allowedUsers).length}ユーザー`);
+  console.log(`🚫 拒否リスト: ${Object.keys(userData.denyUsers).length}ユーザー`);
 
-  if (Object.keys(allowedUsers).length === 0) {
+  if (Object.keys(userData.allowedUsers).length === 0) {
     throw new Error('許諾リストにユーザーが存在しません');
   }
 
   // クイズデータを生成
   const quizData = await generateQuizData({
     relays: [LISTEN_RELAY],
-    allowedUsers,
+    userData,
     questionsCount: 3,
     eventsToFetch: 10000
   });
@@ -38,17 +39,18 @@ export const generateQuizForBot = async () => {
     fs.mkdirSync(dataDir, { recursive: true });
   }
 
-  // クイズデータをJSONファイルとして保存
-  const quizFilePath = path.join(dataDir, 'quiz.json');
+  // 新しいファイル名でクイズデータを保存
+  const quizFileName = generateQuizFileName();
+  const quizFilePath = path.join(dataDir, quizFileName);
   fs.writeFileSync(quizFilePath, JSON.stringify(quizData, null, 2), 'utf-8');
   
-  console.log(`💾 クイズデータを保存しました: ${quizFilePath}`);
+  // quiz.jsonにも最新のクイズデータを保存（後方互換性のため）
+  const legacyQuizFilePath = path.join(dataDir, 'quiz.json');
+  fs.writeFileSync(legacyQuizFilePath, JSON.stringify(quizData, null, 2), 'utf-8');
+  
+  console.log(`💾 クイズデータを保存しました: ${quizFileName}`);
   console.log(`🎮 問題数: ${quizData.questions.length}`);
   console.log(`👤 正解ユーザー: ${quizData.correctUserId.slice(0, 8)}...`);
 
-  // 許諾リストを更新（使用済みユーザーの日時を更新）
-  allowedUsers[quizData.correctUserId] = new Date();
-  await saveAllowedUsers(allowedUsers);
-  
-  console.log('✨ 許諾リストを更新しました');
+  console.log('✨ クイズ生成が完了しました');
 }; 

@@ -1,5 +1,14 @@
 export interface AllowedUsers {
-    [userId: string]: Date;
+    [userId: string]: string;
+}
+
+export interface DenyUsers {
+    [userId: string]: string;
+}
+
+export interface UserData {
+    allowedUsers: AllowedUsers;
+    denyUsers: DenyUsers;
 }
 
 export interface QuizData {

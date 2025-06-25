@@ -1,45 +1,61 @@
-import { loadAllowedUsers, saveAllowedUsers, loadLastSince, saveLastSince, LISTEN_RELAY, sendReply, getBotPublicKey, connectToRelay, getPrivateKey } from '../lib/nostr.ts';
+import { loadUserData, saveUserData, loadLastSince, saveLastSince, LISTEN_RELAY, sendReply, getBotPublicKey, connectToRelay, getPrivateKey } from '../lib/nostr.ts';
 import { Event, Filter } from 'nostr-tools';
-import { AllowedUsers } from '../lib/types.ts';
+import { UserData } from '../lib/types.ts';
 
-const handleReply = async (event: Event, privateKey: string, allowedUsers: AllowedUsers) => {
+const handleReply = async (event: Event, privateKey: string, userData: UserData) => {
   const userPubkey = event.pubkey;
   const content = event.content.trim().toLowerCase();
 
   if (content.slice(-2) === 'ok') {
-    if (allowedUsers[userPubkey]) {
+    if (userData.allowedUsers[userPubkey]) {
       const replyContent = 'あなたは既に許諾リストに含まれています。';
       await sendReply(event, replyContent, privateKey);
     } else {
-      allowedUsers[userPubkey] = new Date(0);
-      await saveAllowedUsers(allowedUsers);
+      // denyUsersにいる場合は削除
+      if (userData.denyUsers[userPubkey]) {
+        delete userData.denyUsers[userPubkey];
+      }
+      
+      // allowedUsersに追加（valueはイベントのid）
+      userData.allowedUsers[userPubkey] = event.id;
+      await saveUserData(userData);
+      
       // 返信メッセージ
       const replyContent = 'あなたはクイズの許諾リストに追加されました！';
       await sendReply(event, replyContent, privateKey);
-      console.log(`ユーザー ${userPubkey} を許諾リストに追加しました。`);
+      console.log(`ユーザー ${userPubkey.slice(0, 8)}... を許諾リストに追加しました。(id: ${event.id.slice(0, 8)}...)`);
     }
   } else if (content.slice(-2) === 'ng') {
-    if (allowedUsers[userPubkey]) {
-      delete allowedUsers[userPubkey];
-      await saveAllowedUsers(allowedUsers);
+    if (userData.allowedUsers[userPubkey]) {
+      // allowedUsersから削除してdenyUsersに移動
+      delete userData.allowedUsers[userPubkey];
+      userData.denyUsers[userPubkey] = event.id;
+      await saveUserData(userData);
+      
       const replyContent = 'あなたはクイズの許諾リストから除外されました。';
       await sendReply(event, replyContent, privateKey);
-      console.log(`ユーザー ${userPubkey} を許諾リストから除外しました。`);
+      console.log(`ユーザー ${userPubkey.slice(0, 8)}... を許諾リストから除外し、拒否リストに追加しました。(id: ${event.id.slice(0, 8)}...)`);
     } else {
-      const replyContent = 'あなたは既に許諾リストに含まれていません。';
+      // 既にallowedUsersにいない場合でも、denyUsersには追加
+      userData.denyUsers[userPubkey] = event.id;
+      await saveUserData(userData);
+      
+      const replyContent = 'あなたは拒否リストに追加されました。';
       await sendReply(event, replyContent, privateKey);
-      console.log(`ユーザー ${userPubkey} は許諾リストに含まれていません。`);
+      console.log(`ユーザー ${userPubkey.slice(0, 8)}... を拒否リストに追加しました。(id: ${event.id.slice(0, 8)}...)`);
     }
   }
 };
 
 export const listenReplies = async () => {
-  const allowedUsers = await loadAllowedUsers();
+  const userData = await loadUserData();
   const privateKey = getPrivateKey(); // 環境変数から取得
   const botPubkey = getBotPublicKey(privateKey);
 
   // 許諾リスト整理開始の通知
   console.log('許諾リスト整理を開始します...');
+  console.log(`📋 許諾リスト: ${Object.keys(userData.allowedUsers).length}ユーザー`);
+  console.log(`🚫 拒否リスト: ${Object.keys(userData.denyUsers).length}ユーザー`);
   
   // 最後にreqした日付を呼び出す
   const filter: Filter = {
@@ -60,7 +76,7 @@ export const listenReplies = async () => {
   ], {
     onevent(event) {
       console.log(`リプライを受信: ${event.pubkey.slice(0, 8)}... -> ${event.content.slice(0, 20)}...`);
-      handleReply(event, privateKey, allowedUsers);
+      handleReply(event, privateKey, userData);
     },
     oneose() {
       console.log('購読終了（End of Stored Events）。');

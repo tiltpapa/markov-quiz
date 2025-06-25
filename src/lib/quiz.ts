@@ -3,7 +3,8 @@ import { generateSentence } from './markov.ts';
 import { nip30, NostrEvent } from 'nostr-tools';
 import { jaModel, Parser } from 'budoux';
 import Markov from 'markov-strings';
-import { AllowedUsers } from './types.ts';
+import { UserData } from './types.ts';
+import { getRecentQuizUsers } from './nostr.ts';
 
 export interface QuizData {
   questions: string[];
@@ -15,7 +16,7 @@ export interface QuizData {
 
 export interface QuizGenerationConfig {
   relays: string[];
-  allowedUsers: AllowedUsers;
+  userData: UserData;
   questionsCount?: number;
   eventsToFetch?: number;
 }
@@ -30,27 +31,30 @@ const sanitizeContent = (content: string): string => {
 };
 
 export const generateQuizData = async (config: QuizGenerationConfig): Promise<QuizData | null> => {
-  const { relays, allowedUsers, questionsCount = 3, eventsToFetch = 10000 } = config;
-  const userIds = Object.keys(allowedUsers);
+  const { relays, userData, questionsCount = 3, eventsToFetch = 10000 } = config;
+  const { allowedUsers, denyUsers } = userData;
+  
+  // 許可されているユーザーのIDリスト（拒否リストにないもののみ）
+  const availableUserIds = Object.keys(allowedUsers).filter(userId => !denyUsers[userId]);
 
-  if (userIds.length === 0) {
+  if (availableUserIds.length === 0) {
     console.log('許諾リストにユーザが存在しません。');
     return null;
   }
 
-  // ランダムにユーザを選択（3日前以降に使われていないユーザを優先）
-  let randomUserId: string = userIds[0]; // 初期値を設定
-  const day3ago = new Date();
-  day3ago.setDate(day3ago.getDate() - 3);
-  
-  for (let i = 0; i < 5; i++) {
-    randomUserId = userIds[Math.floor(Math.random() * userIds.length)];
-    if (allowedUsers[randomUserId] < day3ago) {
-      break;
-    } else {
-      console.log(`このユーザ(${randomUserId})は${allowedUsers[randomUserId].toLocaleString("ja")}にクイズになっています`);
-    }
-  }
+  // 過去3問で使用されたユーザーを取得
+  const recentQuizUsers = getRecentQuizUsers();
+  console.log(`過去3問で使用されたユーザー: ${recentQuizUsers.length}人`);
+
+  // 過去3問で使用されていないユーザーを優先的に選択
+  const preferredUserIds = availableUserIds.filter(userId => !recentQuizUsers.includes(userId));
+  const candidateUserIds = preferredUserIds.length > 0 ? preferredUserIds : availableUserIds;
+
+  console.log(`選択候補ユーザー: ${candidateUserIds.length}人 (優先候補: ${preferredUserIds.length}人)`);
+
+  // ランダムにユーザを選択
+  const randomUserId = candidateUserIds[Math.floor(Math.random() * candidateUserIds.length)];
+  console.log(`選択されたユーザー: ${randomUserId.slice(0, 8)}...`);
 
   // イベントを取得
   const fetcher = NostrFetcher.init();
