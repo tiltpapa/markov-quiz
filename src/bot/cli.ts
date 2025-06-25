@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { generateQuizForBot } from './generate';
 import { listenReplies } from './listen';
-// for trigger github action
+
 const program = new Command();
 
 program
