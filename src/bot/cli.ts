@@ -1,6 +1,6 @@
 import { Command } from 'commander';
-import { generateQuizForBot } from './generate.ts';
-import { listenReplies } from './listen.ts';
+import { generateQuizForBot } from './generate';
+import { listenReplies } from './listen';
 
 const program = new Command();
 

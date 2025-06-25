@@ -1,5 +1,5 @@
-import { generateQuizData } from '../lib/quiz.ts';
-import { loadUserData, saveUserData, LISTEN_RELAY, getPrivateKey, generateQuizFileName } from '../lib/nostr.ts';
+import { generateQuizData } from '../lib/quiz';
+import { loadUserData, saveUserData, LISTEN_RELAY, getPrivateKey, generateQuizFileName } from '../lib/nostr';
 import fs from 'fs';
 import path from 'path';
 
