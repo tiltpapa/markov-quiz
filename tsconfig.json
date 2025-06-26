@@ -2,13 +2,18 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ES2022",
-    "moduleResolution": "node",
-    "outDir": "./dist",
+    "moduleResolution": "bundler",
+    "outDir": "./dist/cli",
     "rootDir": "./src",
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "declaration": true,
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": false
   },
   "include": [
     "src/bot/**/*",
@@ -16,6 +21,7 @@
   ],
   "exclude": [
     "src/app/**/*",
-    "node_modules"
+    "node_modules",
+    "dist"
   ]
 }

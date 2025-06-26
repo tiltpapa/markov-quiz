@@ -1,6 +1,6 @@
-import { loadUserData, saveUserData, loadLastSince, saveLastSince, LISTEN_RELAY, sendReply, getBotPublicKey, connectToRelay, getPrivateKey } from '../lib/nostr';
+import { loadUserData, saveUserData, loadLastSince, saveLastSince, LISTEN_RELAY, sendReply, getBotPublicKey, connectToRelay, getPrivateKey } from '../lib/nostr.js';
 import { Event, Filter } from 'nostr-tools';
-import { UserData } from '../lib/types';
+import { UserData } from '../lib/types.js';
 
 const handleReply = async (event: Event, privateKey: string, userData: UserData) => {
   const userPubkey = event.pubkey;

@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { UserData } from './types';
+import { UserData } from './types.js';
 import { EventTemplate, finalizeEvent, SimplePool, Event, getPublicKey, Relay, Filter } from 'nostr-tools';
 import { hexToBytes } from '@noble/hashes/utils';
 

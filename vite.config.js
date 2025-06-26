@@ -14,5 +14,12 @@ export default defineConfig({
   },
   server: {
     port: 3000
+  },
+  esbuild: {
+    tsconfigRaw: {
+      compilerOptions: {
+        target: 'ES2020'
+      }
+    }
   }
 })

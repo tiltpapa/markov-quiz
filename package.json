@@ -7,12 +7,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run build:web",
+    "build:web": "vite build",
+    "build:cli": "tsc",
+    "build:all": "npm run build:web && npm run build:cli",
     "preview": "vite preview",
     "dev:build": "vite build --mode development",
-    "bot:listen": "node dist/bot/cli.js listen",
-    "bot:generate": "node dist/bot/cli.js generate",
-    "build:bot": "tsc && node dist/bot/cli.js"
+    "bot:listen": "npm run build:cli && node dist/cli/bot/cli.js listen",
+    "bot:generate": "npm run build:cli && node dist/cli/bot/cli.js generate",
+    "clean": "rm -rf dist"
   },
   "exports": {
     ".": {
