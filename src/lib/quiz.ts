@@ -2,7 +2,7 @@ import { NostrFetcher } from 'nostr-fetch';
 import { generateSentence } from './markov.js';
 import { nip30, NostrEvent } from 'nostr-tools';
 import { jaModel, Parser } from 'budoux';
-import Markov from 'markov-strings';
+import { MarkovChain } from 'kurwov';
 import { UserData } from './types.js';
 import { getRecentQuizUsers } from './nostr.js';
 
@@ -91,18 +91,17 @@ export const generateQuizData = async (config: QuizGenerationConfig): Promise<Qu
                     .filter((tag) => tag[0] === "emoji")
   
   // マルコフ連鎖の構築
-  const markov = new Markov({ stateSize: 2 });
-  markov.addData(contents);
+  const markov = new MarkovChain(contents);
 
   // 例文を生成
   const questions: string[] = [];
   for (let i = 0; i < questionsCount; i++) {
-    const sentence = generateSentence(markov);
-    if (sentence.length === 0) {
+    const sentence = markov.generate();
+    if (!sentence || sentence.length === 0) {
       console.log('例文生成に失敗しました。');
       return null;
     }
-    questions.push(sentence.replace(' ',''));
+    questions.push(sentence.replace(/ /g,''));
   }
   
   const quizTags: string[][] = [];

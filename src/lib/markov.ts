@@ -1,12 +1,9 @@
-import Markov from 'markov-strings';
+import { MarkovChain } from 'kurwov';
 
-export const generateSentence = (markov: Markov, maxTries = 100): string => {
+export const generateSentence = (markov: MarkovChain, maxTries = 100): string => {
   try {
-    const result = markov.generate({
-      maxTries,
-      filter: (result) => result.string.split(' ').length >= 3
-    });
-    return result.string;
+    const result = markov.generate();
+    return result || '';
   } catch (error) {
     console.error('マルコフ生成エラー:', error);
     return '';

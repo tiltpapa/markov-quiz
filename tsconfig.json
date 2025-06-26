@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "ES2022",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "outDir": "./dist/cli",
     "rootDir": "./src",
     "esModuleInterop": true,
@@ -12,8 +12,7 @@
     "skipLibCheck": true,
     "declaration": true,
     "sourceMap": true,
-    "resolveJsonModule": true,
-    "verbatimModuleSyntax": false
+    "resolveJsonModule": true
   },
   "include": [
     "src/bot/**/*",
