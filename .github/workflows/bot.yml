@@ -1,0 +1,172 @@
+name: Nostr Quiz Bot
+
+on:
+  push:
+    branches-ignore: [ main ]
+    paths:
+      - 'src/bot/**'
+      - 'src/lib/**'
+      - '.github/workflows/bot.yml'
+  schedule:
+    # JST 0:00 と 12:00 (UTC 15:00 と 3:00) にクイズ生成
+    - cron: '0 15,3 * * *'
+    # 1時間おきにリプライ監視（毎時55分に実行してクイズ生成より先に実行）
+    - cron: '55 * * * *'
+  workflow_dispatch:
+    inputs:
+      action:
+        description: '実行するアクション'
+        required: true
+        default: 'generate'
+        type: choice
+        options:
+        - generate
+        - listen
+        - both
+
+jobs:
+  quiz-generate:
+    if: github.event_name == 'schedule' && github.event.schedule == '0 15,3 * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'generate' || github.event.inputs.action == 'both'))
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build bot
+        run: npm run build:cli
+
+      - name: Generate quiz
+        run: npm run bot:generate
+        env:
+          LISTEN_RELAY: ${{ vars.LISTEN_RELAY }}
+          PUBLISH_RELAYS: ${{ vars.PUBLISH_RELAYS }}
+          NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
+
+      - name: Commit and push quiz data
+#        shell: pwsh
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add static/data/
+          if (git diff --staged --quiet) {
+            Write-Host "No changes to commit"
+          } else {
+            git commit -m "Update quiz data - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+            git push
+          }
+
+  # 開発ブランチ用のクイズ生成（ファイル表示のみ）
+  quiz-generate-dev:
+    if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build bot
+        run: npm run build:cli
+
+      - name: Generate quiz
+        run: npm run bot:generate
+        env:
+          LISTEN_RELAY: ${{ vars.LISTEN_RELAY }}
+          PUBLISH_RELAYS: ${{ vars.PUBLISH_RELAYS }}
+          NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
+
+      - name: Show generated quiz data
+#        shell: pwsh
+        run: |
+          Write-Host "=== Generated Quiz Data ==="
+          if (Test-Path static/data/quiz.json) {
+            Write-Host "Quiz data:"
+            Get-Content static/data/quiz.json -Encoding UTF8
+          }
+          if (Test-Path static/data/allowedUsers.json) {
+            Write-Host "Allowed users:"
+            Get-Content static/data/allowedUsers.json -Encoding UTF8 | Select-Object -First 10
+          }
+          if (Test-Path static/data/lastSince.json) {
+            Write-Host "Last sync:"
+            Get-Content static/data/lastSince.json -Encoding UTF8 | Select-Object -First 5
+          }
+
+  reply-listener:
+    if: github.event_name == 'schedule' && github.event.schedule == '55 * * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'listen' || github.event.inputs.action == 'both'))
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build bot
+        run: npm run build:cli
+
+      - name: Listen to replies
+        run: npm run bot:listen
+        env:
+          LISTEN_RELAY: ${{ vars.LISTEN_RELAY }}
+          PUBLISH_RELAYS: ${{ vars.PUBLISH_RELAYS }}
+          NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
+
+      - name: Commit and push updated data
+#        shell: pwsh
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add static/data/
+          if (git diff --staged --quiet) {
+            Write-Host "No changes to commit"
+          } else {
+            git commit -m "Update allowed users and last sync - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+            git push
+          }
+
+  # Nostrイベント投稿（mainブランチのみ）
+  post-to-nostr:
+    if: github.event_name == 'schedule' && github.event.schedule == '0 15,3 * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'generate' || github.event.inputs.action == 'both'))
+    needs: quiz-generate
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Post quiz to Nostr
+        uses: snow-actions/nostr@v1.8.1
+        with:
+          relays: ${{ vars.PUBLISH_RELAYS }}
+          private-key: ${{ secrets.NOSTR_PRIVATE_KEY }}
+          content: |
+            新しいマルコフ連鎖クイズが出題されました！
+            
+            https://tiltpapa.github.io/markov-quiz/
+            
+            出題対象にされてもよいという方は "OK" とリプライ
+            出題対象から外してほしい方は "NG" とリプライ
+            
+            #quiz #マルコフ連鎖 
