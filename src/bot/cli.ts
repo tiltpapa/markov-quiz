@@ -16,6 +16,7 @@ program
     try {
       await generateQuizForBot();
       console.log('✅ クイズ生成が完了しました');
+      process.exit(0);
     } catch (error) {
       console.error('❌ クイズ生成でエラーが発生しました:', error);
       process.exit(1);
@@ -29,6 +30,7 @@ program
     try {
       await listenReplies();
       console.log('✅ リプライ監視が完了しました');
+      process.exit(0);
     } catch (error) {
       console.error('❌ リプライ監視でエラーが発生しました:', error);
       process.exit(1);
