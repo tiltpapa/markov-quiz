@@ -91,19 +91,19 @@ jobs:
 
       - name: Show generated quiz data
         run: |
-          echo "=== Generated Quiz Data ==="
-          if [ -f static/data/quiz.json ]; then
-            echo "Quiz data:"
-            head -20 static/data/quiz.json
-          fi
-          if [ -f static/data/allowedUsers.json ]; then
-            echo "Allowed users:"
-            head -10 static/data/allowedUsers.json
-          fi
-          if [ -f static/data/lastSince.json ]; then
-            echo "Last sync:"
-            head -5 static/data/lastSince.json
-          fi
+          Write-Host "=== Generated Quiz Data ==="
+          if (Test-Path static/data/quiz.json) {
+            Write-Host "Quiz data:"
+            Get-Content static/data/quiz.json
+          }
+          if (Test-Path static/data/allowedUsers.json) {
+            Write-Host "Allowed users:"
+            Get-Content static/data/allowedUsers.json -TotalCount 10
+          }
+          if (Test-Path static/data/lastSince.json) {
+            Write-Host "Last sync:"
+            Get-Content static/data/lastSince.json -TotalCount 5
+          }
 
   reply-listener:
     if: github.event_name == 'schedule' && github.event.schedule == '55 * * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'listen' || github.event.inputs.action == 'both'))
