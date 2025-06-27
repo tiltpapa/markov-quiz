@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { generateQuizForBot } from './generate.js';
 import { listenReplies } from './listen.js';
-
+// for test github action
 const program = new Command();
 
 program
