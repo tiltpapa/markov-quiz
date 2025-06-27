@@ -52,7 +52,7 @@ jobs:
           NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
 
       - name: Commit and push quiz data
-        shell: pwsh
+#        shell: pwsh
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
@@ -92,7 +92,7 @@ jobs:
           NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
 
       - name: Show generated quiz data
-        shell: pwsh
+#        shell: pwsh
         run: |
           Write-Host "=== Generated Quiz Data ==="
           if (Test-Path static/data/quiz.json) {
@@ -135,7 +135,7 @@ jobs:
           NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
 
       - name: Commit and push updated data
-        shell: pwsh
+#        shell: pwsh
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
