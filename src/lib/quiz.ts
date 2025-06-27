@@ -5,6 +5,7 @@ import { jaModel, Parser } from 'budoux';
 import { MarkovChain } from 'kurwov';
 import { UserData } from './types.js';
 import { getRecentQuizUsers } from './nostr.js';
+import WebSocket from 'ws';
 
 export interface QuizData {
   questions: string[];
