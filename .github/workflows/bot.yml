@@ -6,6 +6,7 @@ on:
     paths:
       - 'src/bot/**'
       - 'src/lib/**'
+      - '.github/workflows/bot.yml'
   schedule:
     # JST 0:00 と 12:00 (UTC 15:00 と 3:00) にクイズ生成
     - cron: '0 15,3 * * *'
@@ -51,16 +52,17 @@ jobs:
           NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
 
       - name: Commit and push quiz data
+        shell: pwsh
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add static/data/
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Update quiz data - $(date '+%Y-%m-%d %H:%M:%S')"
+          if (git diff --staged --quiet) {
+            Write-Host "No changes to commit"
+          } else {
+            git commit -m "Update quiz data - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
             git push
-          fi
+          }
 
   # 開発ブランチ用のクイズ生成（ファイル表示のみ）
   quiz-generate-dev:
@@ -90,6 +92,7 @@ jobs:
           NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
 
       - name: Show generated quiz data
+        shell: pwsh
         run: |
           Write-Host "=== Generated Quiz Data ==="
           if (Test-Path static/data/quiz.json) {
@@ -98,11 +101,11 @@ jobs:
           }
           if (Test-Path static/data/allowedUsers.json) {
             Write-Host "Allowed users:"
-            Get-Content static/data/allowedUsers.json -TotalCount 10
+            Get-Content static/data/allowedUsers.json | Select-Object -First 10
           }
           if (Test-Path static/data/lastSince.json) {
             Write-Host "Last sync:"
-            Get-Content static/data/lastSince.json -TotalCount 5
+            Get-Content static/data/lastSince.json | Select-Object -First 5
           }
 
   reply-listener:
@@ -132,16 +135,17 @@ jobs:
           NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
 
       - name: Commit and push updated data
+        shell: pwsh
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add static/data/
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Update allowed users and last sync - $(date '+%Y-%m-%d %H:%M:%S')"
+          if (git diff --staged --quiet) {
+            Write-Host "No changes to commit"
+          } else {
+            git commit -m "Update allowed users and last sync - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
             git push
-          fi
+          }
 
   # Nostrイベント投稿（mainブランチのみ）
   post-to-nostr:
