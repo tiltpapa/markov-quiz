@@ -41,7 +41,7 @@ jobs:
         run: npm ci
 
       - name: Build bot
-        run: npm run build:bot
+        run: npm run build:cli
 
       - name: Generate quiz
         run: npm run bot:generate
@@ -80,7 +80,7 @@ jobs:
         run: npm ci
 
       - name: Build bot
-        run: npm run build:bot
+        run: npm run build:cli
 
       - name: Generate quiz
         run: npm run bot:generate
@@ -122,7 +122,7 @@ jobs:
         run: npm ci
 
       - name: Build bot
-        run: npm run build:bot
+        run: npm run build:cli
 
       - name: Listen to replies
         run: npm run bot:listen
