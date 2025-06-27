@@ -57,7 +57,7 @@ export const generateQuizData = async (config: QuizGenerationConfig): Promise<Qu
   console.log(`選択されたユーザー: ${randomUserId.slice(0, 8)}...`);
 
   // イベントを取得
-  const fetcher = NostrFetcher.init();
+  const fetcher = NostrFetcher.init({webSocketConstructor: WebSocket});
   const events: NostrEvent[] = await fetcher.fetchLatestEvents(
     relays,
     { kinds: [1], authors: [randomUserId] },
