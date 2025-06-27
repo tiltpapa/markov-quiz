@@ -97,15 +97,15 @@ jobs:
           Write-Host "=== Generated Quiz Data ==="
           if (Test-Path static/data/quiz.json) {
             Write-Host "Quiz data:"
-            Get-Content static/data/quiz.json
+            Get-Content static/data/quiz.json -Encoding UTF8
           }
           if (Test-Path static/data/allowedUsers.json) {
             Write-Host "Allowed users:"
-            Get-Content static/data/allowedUsers.json | Select-Object -First 10
+            Get-Content static/data/allowedUsers.json -Encoding UTF8 | Select-Object -First 10
           }
           if (Test-Path static/data/lastSince.json) {
             Write-Host "Last sync:"
-            Get-Content static/data/lastSince.json | Select-Object -First 5
+            Get-Content static/data/lastSince.json -Encoding UTF8 | Select-Object -First 5
           }
 
   reply-listener:
