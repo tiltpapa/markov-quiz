@@ -7,11 +7,11 @@ on:
       - 'src/bot/**'
       - 'src/lib/**'
       - '.github/workflows/bot.yml'
-  schedule:
+#  schedule:
     # JST 0:00 と 12:00 (UTC 15:00 と 3:00) にクイズ生成
-    - cron: '0 15,3 * * *'
+#    - cron: '0 15,3 * * *'
     # 1時間おきにリプライ監視（毎時55分に実行してクイズ生成より先に実行）
-    - cron: '55 * * * *'
+#    - cron: '55 * * * *'
   workflow_dispatch:
     inputs:
       action:
@@ -159,7 +159,7 @@ jobs:
       - name: Post quiz to Nostr
         uses: snow-actions/nostr@v1.8.1
         with:
-          relays: ${{ vars.PUBLISH_RELAYS }}
+          relays: ${{ vars.PUBLISH_RELAYS_ACTION }}
           private-key: ${{ secrets.NOSTR_PRIVATE_KEY }}
           content: |
             新しいマルコフ連鎖クイズが出題されました！
