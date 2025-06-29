@@ -32,7 +32,7 @@ export default defineConfig({
   plugins: [
     svelte(),
     nodePolyfills(),
-    copyDataPlugin()
+//    copyDataPlugin()
   ],
   base: process.env.NODE_ENV === 'production' ? '/markov-quiz/' : '/',
   build: {
