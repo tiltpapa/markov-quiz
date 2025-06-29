@@ -4,10 +4,10 @@ import { UserData } from './types.js';
 import { EventTemplate, finalizeEvent, SimplePool, Event, getPublicKey, Relay, Filter } from 'nostr-tools';
 import { hexToBytes } from '@noble/hashes/utils';
 
-// 静的データディレクトリ（公開）
-const STATIC_DATA_DIR = path.join(process.cwd(), 'static', 'data');
-const ALLOWED_USERS_FILE = path.join(STATIC_DATA_DIR, 'allowedUsers.json');
-const LAST_SINCE_FILE = path.join(STATIC_DATA_DIR, 'lastSince.json');
+// データディレクトリ（src内）
+const DATA_DIR = path.join(process.cwd(), 'src', 'data');
+const ALLOWED_USERS_FILE = path.join(DATA_DIR, 'allowedUsers.json');
+const LAST_SINCE_FILE = path.join(DATA_DIR, 'lastSince.json');
 
 // 環境変数からリレー情報を取得
 export const LISTEN_RELAY = process.env.LISTEN_RELAY || 'wss://relay.damus.io';
@@ -40,16 +40,16 @@ export const loadUserData = async (): Promise<UserData> => {
 };
 
 export const saveUserData = async (userData: UserData): Promise<void> => {
-  // static/dataディレクトリが存在しない場合は作成
-  if (!fs.existsSync(STATIC_DATA_DIR)) {
-    fs.mkdirSync(STATIC_DATA_DIR, { recursive: true });
+  // src/dataディレクトリが存在しない場合は作成
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
   }
   fs.writeFileSync(ALLOWED_USERS_FILE, JSON.stringify(userData, null, 2), 'utf-8');
 };
 
 // 過去問から使用されたユーザーを取得する関数
 export const getRecentQuizUsers = (): string[] => {
-  const files = fs.readdirSync(STATIC_DATA_DIR)
+  const files = fs.readdirSync(DATA_DIR)
     .filter(file => file.match(/^quiz_\d{12}\.json$/))
     .sort((a, b) => b.localeCompare(a)) // 降順でソート（新しいファイルから）
     .slice(0, 3); // 過去3問分
@@ -57,7 +57,7 @@ export const getRecentQuizUsers = (): string[] => {
   const recentUsers: string[] = [];
   for (const file of files) {
     try {
-      const filePath = path.join(STATIC_DATA_DIR, file);
+      const filePath = path.join(DATA_DIR, file);
       const quizData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
       if (quizData.correctUserId) {
         recentUsers.push(quizData.correctUserId);
@@ -93,9 +93,9 @@ export const loadLastSince = async (): Promise<number> => {
 };
 
 export const saveLastSince = async (timestamp: number): Promise<void> => {
-  // static/dataディレクトリが存在しない場合は作成
-  if (!fs.existsSync(STATIC_DATA_DIR)) {
-    fs.mkdirSync(STATIC_DATA_DIR, { recursive: true });
+  // src/dataディレクトリが存在しない場合は作成
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
   }
   
   const data = {
