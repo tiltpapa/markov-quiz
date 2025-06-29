@@ -32,7 +32,7 @@ const sanitizeContent = (content: string): string => {
 };
 
 export const generateQuizData = async (config: QuizGenerationConfig): Promise<QuizData | null> => {
-  const { relays, userData, questionsCount = 3, eventsToFetch = 10000 } = config;
+  const { relays, userData, questionsCount = 5, eventsToFetch = 10000 } = config;
   const { allowedUsers, denyUsers } = userData;
   
   // 許可されているユーザーのIDリスト（拒否リストにないもののみ）
