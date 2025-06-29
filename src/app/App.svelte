@@ -2,6 +2,11 @@
   import { onMount } from 'svelte';
   import QuizComponent from './components/QuizComponent.svelte';
   import type { QuizData } from '../lib/types.ts';
+  
+  // 静的データを直接import
+  import quizData from '../data/quiz.json';
+  import lastSinceData from '../data/lastSince.json';
+  import allowedUsersData from '../data/allowedUsers.json';
 
   let currentQuiz: QuizData | null = null;
   let loading = true;
@@ -9,49 +14,26 @@
   let lastSyncInfo: any = null;
   let allowedUsersCount = 0;
 
-  const loadQuiz = async () => {
+  const loadData = () => {
     try {
       loading = true;
       error = '';
       
-      // GitHub Pagesから最新のクイズデータを取得
-      const response = await fetch('./data/quiz.json');
-      if (!response.ok) {
-        throw new Error('クイズデータの取得に失敗しました');
-      }
-      
-      const quizData = await response.json();
+      // インポートしたデータを直接使用
       currentQuiz = quizData;
+      lastSyncInfo = lastSinceData;
+      allowedUsersCount = Object.keys(allowedUsersData).length;
+      
     } catch (err) {
-      error = err instanceof Error ? err.message : 'エラーが発生しました';
-      console.error('クイズ読み込みエラー:', err);
+      error = err instanceof Error ? err.message : 'データの読み込みに失敗しました';
+      console.error('データ読み込みエラー:', err);
     } finally {
       loading = false;
     }
   };
 
-  const loadSystemInfo = async () => {
-    try {
-      // 最終同期情報を取得
-      const lastSyncResponse = await fetch('./data/lastSince.json');
-      if (lastSyncResponse.ok) {
-        lastSyncInfo = await lastSyncResponse.json();
-      }
-
-      // 許可ユーザー数を取得
-      const allowedUsersResponse = await fetch('./data/allowedUsers.json');
-      if (allowedUsersResponse.ok) {
-        const allowedUsers = await allowedUsersResponse.json();
-        allowedUsersCount = Object.keys(allowedUsers).length;
-      }
-    } catch (err) {
-      console.error('システム情報読み込みエラー:', err);
-    }
-  };
-
   onMount(() => {
-    loadQuiz();
-    loadSystemInfo();
+    loadData();
   });
 </script>
 
@@ -81,7 +63,7 @@
           <div class="text-danger mb-3">
             <h5>❌ {error}</h5>
           </div>
-          <button class="btn btn-primary" on:click={loadQuiz}>再読み込み</button>
+          <button class="btn btn-primary" on:click={loadData}>再読み込み</button>
         </div>
       </div>
     {:else if currentQuiz}
@@ -90,7 +72,7 @@
       <div class="card bg-white bg-opacity-90 shadow">
         <div class="card-body text-center py-5">
           <h5 class="mb-3">📝 クイズが見つかりません</h5>
-          <button class="btn btn-primary" on:click={loadQuiz}>再読み込み</button>
+          <button class="btn btn-primary" on:click={loadData}>再読み込み</button>
         </div>
       </div>
     {/if}
@@ -132,16 +114,10 @@
                 </div>
               {/if}
             </div>
-            <div class="d-flex flex-wrap justify-content-center gap-2">
-              <a href="./data/allowedUsers.json" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">
-                📋 許可ユーザーリスト
-              </a>
-              <a href="./data/lastSince.json" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">
-                🕒 最終同期情報
-              </a>
-              <a href="./data/quiz.json" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">
-                🎯 クイズデータ
-              </a>
+            <div class="text-center">
+              <p class="text-muted small mb-0">
+                データファイルはアプリケーション内に統合されています
+              </p>
             </div>
           </div>
         </div>

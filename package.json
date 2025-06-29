@@ -13,6 +13,8 @@
     "build:all": "npm run build:web && npm run build:cli",
     "preview": "vite preview",
     "dev:build": "vite build --mode development",
+    "build:root": "vite build --base /",
+    "build:github": "vite build --base /markov-quiz/",
     "bot:listen": "npm run build:cli && node dist/cli/bot/cli.js listen",
     "bot:generate": "npm run build:cli && node dist/cli/bot/cli.js generate",
     "clean": "rm -rf dist"

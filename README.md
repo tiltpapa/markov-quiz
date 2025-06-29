@@ -49,7 +49,7 @@ markov-quiz/
 ├── .github/workflows/ # GitHub Actions設定
 │   ├── bot.yml        # Bot運用（毎日クイズ生成・リプライ監視）
 │   └── deploy.yml     # GitHub Pages自動デプロイ
-├── static/data/       # 公開データ
+├── src/data/          # データファイル
 │   ├── quiz.json      # 現在のクイズ
 │   ├── allowedUsers.json # 許可ユーザーリスト
 │   └── lastSince.json # 最終同期情報

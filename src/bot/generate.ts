@@ -27,13 +27,8 @@ export const generateQuizForBot = async () => {
     throw new Error('クイズデータの生成に失敗しました');
   }
 
-  // 静的ファイルディレクトリの作成
-  const staticDir = path.join(process.cwd(), 'static');
-  const dataDir = path.join(staticDir, 'data');
-  
-  if (!fs.existsSync(staticDir)) {
-    fs.mkdirSync(staticDir, { recursive: true });
-  }
+  // データディレクトリの作成
+  const dataDir = path.join(process.cwd(), 'src', 'data');
   
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
