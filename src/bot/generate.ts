@@ -19,7 +19,7 @@ export const generateQuizForBot = async () => {
   const quizData = await generateQuizData({
     relays: [LISTEN_RELAY],
     userData,
-    questionsCount: 3,
+    questionsCount: 5,
     eventsToFetch: 10000
   });
 
