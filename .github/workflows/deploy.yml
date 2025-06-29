@@ -6,6 +6,7 @@ on:
     paths:
       - 'src/app/**'
       - 'src/lib/**'
+      - 'src/data/**'
       - 'static/**'
       - 'index.html'
       - 'package.json'
@@ -46,10 +47,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Copy data files
+        run: |
+          mkdir -p static/data
+          cp src/data/* static/data/ 2>/dev/null || true
+
       - name: Build
-        run: npm run build
-        env:
-          VITE_BASE_PATH: ${{ steps.branch.outputs.name == 'main' && '/markov-quiz/' || format('/markov-quiz/{0}/', steps.branch.outputs.name) }}
+        run: npm run build:github
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
