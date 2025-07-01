@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import type { QuizData } from '../../lib/types.ts';
+  import EmojiText from './EmojiText.svelte';
 
   export let quiz: QuizData;
 
@@ -65,7 +66,9 @@
           <div class="card-body py-3">
             <div class="d-flex align-items-center">
               <span class="badge bg-primary me-3 mt-1 d-flex align-items-center justify-content-center" style="height: 100%;">{index + 1}</span>
-              <div class="flex-grow-1 lh-base">{question}</div>
+              <div class="flex-grow-1 lh-base">
+                <EmojiText text={question} emojiTags={quiz.emojiTags} />
+              </div>
             </div>
           </div>
         </div>
@@ -155,17 +158,6 @@
           >
             📱 プロフィールを見る
           </a>
-        </div>
-      </div>
-    {/if}
-
-    {#if quiz.emojiTags && quiz.emojiTags.length > 0}
-      <div class="mt-4 p-3 bg-warning bg-opacity-10 border border-warning border-opacity-25 rounded">
-        <h6 class="text-warning-emphasis mb-3">使用されているカスタム絵文字</h6>
-        <div class="d-flex flex-wrap gap-2">
-          {#each quiz.emojiTags as tag}
-            <span class="badge bg-warning text-dark">:{tag[1]}:</span>
-          {/each}
         </div>
       </div>
     {/if}
