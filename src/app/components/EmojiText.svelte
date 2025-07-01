@@ -5,17 +5,13 @@
   export let emojiTags: string[][] = [];
 
   interface TextSegment {
-    type: 'text' | 'emoji';
+    type: 'text' | 'emoji' | 'newline';
     content: string;
     emojiUrl?: string;
     emojiName?: string;
   }
 
   const parseTextWithEmojis = (text: string, emojiTags: string[][]): TextSegment[] => {
-    if (!emojiTags || emojiTags.length === 0) {
-      return [{ type: 'text', content: text }];
-    }
-
     const segments: TextSegment[] = [];
 
     // 絵文字のパターンマップを作成
@@ -28,27 +24,41 @@
 
     // nip30を使って絵文字のマッチを取得
     const emojiMatches: Array<{ name: string; start: number; end: number }> = [];
-    const emojiIterator = nip30.matchAll(text);
-    
-    for (const emojiMatch of emojiIterator) {
-      const emojiInfo = emojiMap.get(emojiMatch.name);
-      if (emojiInfo) {
-        emojiMatches.push({
-          name: emojiMatch.name,
-          start: emojiMatch.start,
-          end: emojiMatch.end
-        });
+    if (emojiTags && emojiTags.length > 0) {
+      const emojiIterator = nip30.matchAll(text);
+      
+      for (const emojiMatch of emojiIterator) {
+        const emojiInfo = emojiMap.get(emojiMatch.name);
+        if (emojiInfo) {
+          emojiMatches.push({
+            name: emojiMatch.name,
+            start: emojiMatch.start,
+            end: emojiMatch.end
+          });
+        }
       }
     }
 
-    // マッチした位置でソート
-    emojiMatches.sort((a, b) => a.start - b.start);
+    // 改行の位置を取得
+    const newlineMatches: Array<{ start: number; end: number }> = [];
+    for (let i = 0; i < text.length; i++) {
+      if (text[i] === '\n') {
+        newlineMatches.push({ start: i, end: i + 1 });
+      }
+    }
+
+    // すべてのマッチを統合してソート
+    const allMatches: Array<{ type: 'emoji' | 'newline'; start: number; end: number; name?: string }> = [
+      ...emojiMatches.map(match => ({ type: 'emoji' as const, ...match })),
+      ...newlineMatches.map(match => ({ type: 'newline' as const, ...match }))
+    ];
+    allMatches.sort((a, b) => a.start - b.start);
 
     let lastIndex = 0;
 
-    // 各絵文字マッチについて処理
-    for (const match of emojiMatches) {
-      // マッチした絵文字の前のテキストを追加
+    // 各マッチについて処理
+    for (const match of allMatches) {
+      // マッチの前のテキストを追加
       if (match.start > lastIndex) {
         const beforeText = text.substring(lastIndex, match.start);
         if (beforeText) {
@@ -56,14 +66,22 @@
         }
       }
 
-      // 絵文字セグメントを追加
-      const emojiInfo = emojiMap.get(match.name);
-      if (emojiInfo) {
+      if (match.type === 'emoji' && match.name) {
+        // 絵文字セグメントを追加
+        const emojiInfo = emojiMap.get(match.name);
+        if (emojiInfo) {
+          segments.push({
+            type: 'emoji',
+            content: text.substring(match.start, match.end),
+            emojiUrl: emojiInfo.url,
+            emojiName: emojiInfo.name
+          });
+        }
+      } else if (match.type === 'newline') {
+        // 改行セグメントを追加
         segments.push({
-          type: 'emoji',
-          content: text.substring(match.start, match.end),
-          emojiUrl: emojiInfo.url,
-          emojiName: emojiInfo.name
+          type: 'newline',
+          content: '\n'
         });
       }
 
@@ -78,7 +96,7 @@
       }
     }
 
-    // 絵文字が見つからなかった場合は元のテキストをそのまま返す
+    // 何も見つからなかった場合は元のテキストをそのまま返す
     if (segments.length === 0) {
       return [{ type: 'text', content: text }];
     }
@@ -100,6 +118,8 @@
         style="width: 1.5em; height: 1.5em; vertical-align: middle; margin: 0 2px; display: inline-block;"
         loading="lazy"
       />
+    {:else if segment.type === 'newline'}
+      <br />
     {:else}
       {segment.content}
     {/if}
