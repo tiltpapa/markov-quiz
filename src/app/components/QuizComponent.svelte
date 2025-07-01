@@ -99,9 +99,11 @@
   </div>
 
   <div class="card-body">
+<!--
     <div class="alert alert-info border-start border-primary border-4 bg-primary bg-opacity-10 mb-4">
       <p class="fw-semibold mb-0">次の文章はどのユーザーの投稿から生成されたでしょうか？</p>
     </div>
+-->
     
     <div class="mb-4">
       {#each quiz.questions as question, index}
@@ -118,9 +120,13 @@
       {/each}
     </div>
 
+    <div class="bg-light border border-light rounded p-4 mb-4">
+      <b>ヒント</b> 実装予定
+    </div>
+
     {#if !showCorrectResult && !showIncorrectResult}
       <div class="bg-light border border-light-subtle rounded p-4">
-        <label for="answer" class="form-label fw-semibold text-dark mb-3">Answer</label>
+        <label for="answer" class="form-label fw-semibold text-dark mb-3">回答欄</label>
         {#if quizAttempt && quizAttempt.attempts > 0}
           <div class="alert alert-info mb-3">
             挑戦回数: {quizAttempt.attempts}回
@@ -169,9 +175,11 @@
           <button class="btn btn-secondary" on:click={giveUpQuiz}>
             リタイヤして答えを見る
           </button>
+<!--      
           <button class="btn btn-outline-primary" on:click={resetQuiz}>
             新しいクイズを読み込む
           </button>
+-->
         </div>
       </div>
     {:else if showCorrectResult}
@@ -185,7 +193,7 @@
                   {quiz.userInfo.display_name || quiz.userInfo.name}
               {/if}
             </h6>
-            <div id="nostr-embed"></div>
+            <p class="text-muted small mb-0">{quiz.userInfo.npub}</p>
           </div>
         </div>
 
@@ -212,21 +220,27 @@
         </div>
 
         <div class="d-flex flex-wrap gap-2">
+<!--
           <button class="btn btn-primary" on:click={resetQuiz}>
             新しいクイズを読み込む
           </button>
+-->
           
           <a 
-            href={`https://iris.to/${quiz.userInfo.id}`} 
+            href={`https://njump.me/${quiz.userInfo.npub}`} 
             target="_blank" 
             rel="noopener"
             class="btn btn-success"
           >
-            📱 プロフィールを見る
+            プロフィールを見る
           </a>
         </div>
       </div>
     {/if}
+
+    <div class="bg-light border border-light rounded p-4 mt-4">
+      <b>過去問</b> 実装予定
+    </div>
   </div>
 </div>
 
