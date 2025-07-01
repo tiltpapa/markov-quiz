@@ -1,6 +1,7 @@
 import { NostrFetcher } from 'nostr-fetch';
 import { generateSentence } from './markov.js';
-import { nip30, NostrEvent } from 'nostr-tools';
+import { nip30, NostrEvent, nip19, Relay } from 'nostr-tools';
+// import { useWebSocketImplementation } from 'nostr-tools/relay';
 import { jaModel, Parser } from 'budoux';
 import { MarkovChain } from 'kurwov';
 import { UserData } from './types.js';
@@ -9,10 +10,14 @@ import WebSocket from 'ws';
 
 export interface QuizData {
   questions: string[];
-  correctUserId: string;
-  userDisplayName?: string;
   createdAt: number;
   emojiTags: string[][];
+  userInfo: {
+    id: string;
+    name?: string;
+    display_name?: string;
+    npub: string;
+  };
 }
 
 export interface QuizGenerationConfig {
@@ -57,8 +62,51 @@ export const generateQuizData = async (config: QuizGenerationConfig): Promise<Qu
   const randomUserId = candidateUserIds[Math.floor(Math.random() * candidateUserIds.length)];
   console.log(`選択されたユーザー: ${randomUserId.slice(0, 8)}...`);
 
-  // イベントを取得
+  // NostrFetcherを初期化（WebSocketを一度だけ使用）
   const fetcher = NostrFetcher.init({webSocketConstructor: WebSocket});
+
+  // ユーザーのプロフィール情報を取得
+  let userInfo: { id: string; name?: string; display_name?: string; npub: string };
+  try {
+    const profileEvents = await fetcher.fetchLatestEvents(
+      relays,
+      { kinds: [0], authors: [randomUserId] },
+      1
+    );
+
+    if (profileEvents.length > 0) {
+      try {
+        const profileData = JSON.parse(profileEvents[0].content);
+        userInfo = {
+          id: randomUserId,
+          name: profileData.name,
+          display_name: profileData.display_name,
+          npub: nip19.npubEncode(randomUserId)
+        };
+        console.log(`ユーザー情報取得成功: ${profileData.name || profileData.display_name || 'Unknown'}`);
+      } catch (error) {
+        console.log('プロフィール情報のパースに失敗しました');
+        userInfo = {
+          id: randomUserId,
+          npub: nip19.npubEncode(randomUserId)
+        };
+      }
+    } else {
+      console.log('プロフィール情報が見つかりませんでした');
+      userInfo = {
+        id: randomUserId,
+        npub: nip19.npubEncode(randomUserId)
+      };
+    }
+  } catch (error) {
+    console.log('プロフィール情報の取得に失敗しました:', error);
+    userInfo = {
+      id: randomUserId,
+      npub: nip19.npubEncode(randomUserId)
+    };
+  }
+
+  // イベントを取得（同じfetcherインスタンスを再利用）
   const events: NostrEvent[] = await fetcher.fetchLatestEvents(
     relays,
     { kinds: [1], authors: [randomUserId] },
@@ -116,8 +164,8 @@ export const generateQuizData = async (config: QuizGenerationConfig): Promise<Qu
 
   return {
     questions,
-    correctUserId: randomUserId,
     createdAt: Date.now(),
-    emojiTags: quizTags
+    emojiTags: quizTags,
+    userInfo
   };
 }; 

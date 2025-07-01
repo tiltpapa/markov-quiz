@@ -13,8 +13,12 @@ export interface UserData {
 
 export interface QuizData {
   questions: string[];
-  correctUserId: string;
-  userDisplayName?: string;
   createdAt: number;
   emojiTags: string[][];
+  userInfo: {
+    id: string;
+    name?: string;
+    display_name?: string;
+    npub: string;
+  };
 } 
