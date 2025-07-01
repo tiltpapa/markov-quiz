@@ -45,7 +45,7 @@ export const generateQuizForBot = async () => {
   
   console.log(`💾 クイズデータを保存しました: ${quizFileName}`);
   console.log(`🎮 問題数: ${quizData.questions.length}`);
-  console.log(`👤 正解ユーザー: ${quizData.correctUserId.slice(0, 8)}...`);
+  console.log(`👤 正解ユーザー: ${quizData.userInfo.id.slice(0, 8)}...`);
 
   console.log('✨ クイズ生成が完了しました');
 }; 

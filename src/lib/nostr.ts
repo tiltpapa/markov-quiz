@@ -59,8 +59,11 @@ export const getRecentQuizUsers = (): string[] => {
     try {
       const filePath = path.join(DATA_DIR, file);
       const quizData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-      if (quizData.correctUserId) {
-        recentUsers.push(quizData.correctUserId);
+      
+      // 新しい構造（userInfo.id）と古い構造（correctUserId）の両方に対応
+      const userId = quizData.userInfo?.id || quizData.correctUserId;
+      if (userId) {
+        recentUsers.push(userId);
       }
     } catch (error) {
       console.log(`クイズファイル読み込みエラー: ${file}`);
