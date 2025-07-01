@@ -1,5 +1,5 @@
 import { loadUserData, saveUserData, loadLastSince, saveLastSince, LISTEN_RELAY, sendReply, getBotPublicKey, connectToRelay, getPrivateKey } from '../lib/nostr.js';
-import { Event, Filter } from 'nostr-tools';
+import { Event, Filter, verifyEvent } from 'nostr-tools';
 import { UserData } from '../lib/types.js';
 
 const handleReply = async (event: Event, privateKey: string, userData: UserData) => {
@@ -76,6 +76,15 @@ export const listenReplies = async () => {
   ], {
     onevent(event) {
       console.log(`リプライを受信: ${event.pubkey.slice(0, 8)}... -> ${event.content.slice(0, 20)}...`);
+      
+      // イベントの署名検証を実行
+      const isValid = verifyEvent(event);
+      if (!isValid) {
+        // console.log(`無効な署名のイベントを無視: ${event.id.slice(0, 8)}... from ${event.pubkey.slice(0, 8)}...`);
+        return;
+      }
+      
+      // console.log(`イベント署名検証成功: ${event.id.slice(0, 8)}...`);
       handleReply(event, privateKey, userData);
     },
     oneose() {
