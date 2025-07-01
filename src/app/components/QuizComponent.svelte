@@ -21,7 +21,7 @@
     }
     
     showResult = true;
-    userAnswers[quiz.correctUserId] = selectedAnswer;
+    userAnswers[quiz.userInfo.id] = selectedAnswer;
   };
 
   const resetQuiz = () => {
@@ -31,8 +31,20 @@
   };
 
   const copyUserId = () => {
-    navigator.clipboard.writeText(quiz.correctUserId);
+    navigator.clipboard.writeText(quiz.userInfo.id);
     alert('ユーザーIDをコピーしました！');
+  };
+
+  const isCorrectAnswer = (answer: string): boolean => {
+    const lowerAnswer = answer.toLowerCase();
+    const { id, npub, name, display_name } = quiz.userInfo;
+    
+    return (
+      lowerAnswer.includes(id.toLowerCase()) ||
+      lowerAnswer.includes(npub.toLowerCase()) ||
+      (name && lowerAnswer.includes(name.toLowerCase())) ||
+      (display_name && lowerAnswer.includes(display_name.toLowerCase()))
+    );
   };
 </script>
 
@@ -92,25 +104,28 @@
         <div class="card mb-3">
           <div class="card-body">
             <h6 class="card-title text-dark mb-3">正解:</h6>
-              <div class="d-flex align-items-center gap-2 mb-2">
-                <button 
-                  class="flex-grow-1 bg-light p-2 rounded border user-select-all text-break btn text-start"
-                  style="font-family: monospace; word-break: break-all;"
-                  on:click={copyUserId}
-                >
-                  {quiz.correctUserId}
-                </button>
-                <button 
-                  class="btn btn-outline-primary btn-sm" 
-                  on:click={copyUserId} 
-                  title="コピー"
-                >
-                📋
-                </button>
-            </div>
-            {#if quiz.userDisplayName}
-              <p class="text-muted fst-italic small mb-0">表示名: {quiz.userDisplayName}</p>
+            {#if quiz.userInfo.display_name || quiz.userInfo.name}
+              <p class="h6 text-primary mb-2">
+                {quiz.userInfo.display_name || quiz.userInfo.name}
+              </p>
             {/if}
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <button 
+                class="flex-grow-1 bg-light p-2 rounded border user-select-all text-break btn text-start"
+                style="font-family: monospace; word-break: break-all;"
+                on:click={copyUserId}
+              >
+                {quiz.userInfo.id}
+              </button>
+              <button 
+                class="btn btn-outline-primary btn-sm" 
+                on:click={copyUserId} 
+                title="コピー"
+              >
+              📋
+              </button>
+            </div>
+            <p class="text-muted small mb-0">npub: {quiz.userInfo.npub}</p>
           </div>
         </div>
 
@@ -118,8 +133,7 @@
           <div class="card-body">
             <h6 class="card-title text-dark mb-2">あなたの回答: <span class="fw-normal">{selectedAnswer}</span></h6>
             <div class="fw-semibold">
-              {#if selectedAnswer.toLowerCase().includes(quiz.correctUserId.toLowerCase()) || 
-                   (quiz.userDisplayName && selectedAnswer.toLowerCase().includes(quiz.userDisplayName.toLowerCase()))}
+              {#if isCorrectAnswer(selectedAnswer)}
                 <div class="text-success">✅ 正解です！おめでとうございます！</div>
               {:else}
                 <div class="text-danger">❌ 残念！正解は上記のユーザーでした。</div>
@@ -134,7 +148,7 @@
           </button>
           
           <a 
-            href={`https://iris.to/${quiz.correctUserId}`} 
+            href={`https://iris.to/${quiz.userInfo.id}`} 
             target="_blank" 
             rel="noopener"
             class="btn btn-success"
