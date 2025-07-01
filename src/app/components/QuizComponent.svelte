@@ -4,6 +4,7 @@
   import type { QuizAttempt } from '../../lib/storage';
   import { quizStorage } from '../../lib/storage';
   import EmojiText from './EmojiText.svelte';
+  import { SimplePool, type EventTemplate } from 'nostr-tools';
 
   export let quiz: QuizData;
 
@@ -13,6 +14,7 @@
   let userAnswers: { [key: string]: string } = {};
   let quizAttempt: QuizAttempt | null = null;
   let quizId = '';
+  let isSharing = false;
 
 //  const dispatch = createEventDispatcher();
 
@@ -89,6 +91,76 @@
       (name && lowerAnswer.includes(name.toLowerCase())) ||
       (display_name && lowerAnswer.includes(display_name.toLowerCase()))
     );
+  };
+
+  const createShareText = (): string => {
+    const createdDate = formatDate(quiz.createdAt);
+    const attempts = quizAttempt?.attempts || 1;
+    const result = quizAttempt?.correct ? '正解しました！' : 'リタイヤしました';
+    
+    return `markov-quiz
+${createdDate}作成の問題
+${attempts}回目で${result}
+
+https://tiltpapa.github.io/markov-quiz/
+#markov_quiz`;
+  };
+
+  const copyToClipboard = async () => {
+    try {
+      const shareText = createShareText();
+      await navigator.clipboard.writeText(shareText);
+      alert('投稿内容をクリップボードにコピーしました！');
+    } catch (err) {
+      alert('クリップボードへのコピーに失敗しました');
+    }
+  };
+
+  const shareToNostr = async () => {
+    if (isSharing) return;
+    isSharing = true;
+    
+    try {
+      // NIP-07の存在確認
+      if (!window.nostr) {
+        alert('Nostr拡張機能が見つかりません。クリップボードにコピーしました。');
+        await copyToClipboard();
+        return;
+      }
+
+      const shareText = createShareText();
+      const pubkey = await window.nostr.getPublicKey();
+      
+      const event: EventTemplate = {
+        kind: 1,
+        created_at: Math.floor(Date.now() / 1000),
+        tags: [["t", "markov_quiz"]],
+        content: shareText,
+      };
+
+      const signedEvent = await window.nostr.signEvent(event);
+      
+      // リレーに投稿
+      const pool = new SimplePool();
+      const relays = [
+        'wss://relay.damus.io',
+        'wss://nos.lol',
+        'wss://relay-jp.nostr.wirednet.jp',
+        'wss://yabu.me'
+      ];
+      
+      await Promise.all(pool.publish(relays, signedEvent));
+      pool.close(relays);
+      
+      alert('Nostrに投稿しました！');
+      
+    } catch (error) {
+      console.error('Nostr投稿エラー:', error);
+      alert('投稿に失敗しました。クリップボードにコピーしました。');
+      await copyToClipboard();
+    } finally {
+      isSharing = false;
+    }
   };
 </script>
 
@@ -219,12 +291,25 @@
           </div>
         </div>
 
-        <div class="d-flex flex-wrap gap-2">
-<!--
-          <button class="btn btn-primary" on:click={resetQuiz}>
-            新しいクイズを読み込む
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <button 
+            class="btn btn-primary"
+            on:click={shareToNostr}
+            disabled={isSharing}
+          >
+            {#if isSharing}
+              投稿中...
+            {:else}
+              Nostrでシェア
+            {/if}
           </button>
--->
+          
+          <button 
+            class="btn btn-outline-primary"
+            on:click={copyToClipboard}
+          >
+            コピー
+          </button>
           
           <a 
             href={`https://njump.me/${quiz.userInfo.npub}`} 
