@@ -47,10 +47,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Copy data files
-        run: |
-          mkdir -p static/data
-          cp src/data/* static/data/ 2>/dev/null || true
+#      - name: Copy data files
+#        run: |
+#          mkdir -p static/data
+#          cp src/data/* static/data/ 2>/dev/null || true
 
       - name: Build
         run: npm run build:github
