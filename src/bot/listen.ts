@@ -51,20 +51,20 @@ export const listenReplies = async () => {
   const userData = await loadUserData();
   const privateKey = getPrivateKey(); // 環境変数から取得
   const botPubkey = getBotPublicKey(privateKey);
+  const lastSince = await loadLastSince();
 
   // 許諾リスト整理開始の通知
   console.log('許諾リスト整理を開始します...');
-  console.log(`📋 許諾リスト: ${Object.keys(userData.allowedUsers).length}ユーザー`);
-  console.log(`🚫 拒否リスト: ${Object.keys(userData.denyUsers).length}ユーザー`);
+  console.log(`許諾リスト: ${Object.keys(userData.allowedUsers).length}ユーザー`);
+  console.log(`拒否リスト: ${Object.keys(userData.denyUsers).length}ユーザー`);
   
   // 最後にreqした日付を呼び出す
   const filter: Filter = {
     kinds: [1],
     '#p': [botPubkey],
+    since: lastSince
   };
   
-  const lastSince = await loadLastSince();
-  filter.since = lastSince;
   console.log(`前回取得時刻: ${new Date(lastSince * 1000).toLocaleString('ja')}`);
 
   const relay = await connectToRelay(LISTEN_RELAY);
