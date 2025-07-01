@@ -38,7 +38,7 @@
 
 <div class="card bg-white bg-opacity-95 shadow-lg mb-4">
   <div class="card-header text-center bg-primary bg-opacity-10 border-bottom border-primary border-opacity-25">
-    <h2 class="h4 text-dark mb-2">📝 クイズ問題</h2>
+    <h2 class="h4 text-dark mb-2">問題</h2>
     <p class="text-muted small mb-0">作成日時: {formatDate(quiz.createdAt)}</p>
   </div>
 
@@ -51,8 +51,8 @@
       {#each quiz.questions as question, index}
         <div class="card bg-light border-0 mb-3">
           <div class="card-body py-3">
-            <div class="d-flex">
-              <span class="badge bg-primary me-3 mt-1 flex-shrink-0">{index + 1}</span>
+            <div class="d-flex align-items-center">
+              <span class="badge bg-primary me-3 mt-1 d-flex align-items-center justify-content-center" style="height: 100%;">{index + 1}</span>
               <div class="flex-grow-1 lh-base">{question}</div>
             </div>
           </div>
@@ -62,14 +62,14 @@
 
     {#if !showResult}
       <div class="bg-light border border-light-subtle rounded p-4">
-        <label for="answer" class="form-label fw-semibold text-dark mb-3">あなたの回答:</label>
+        <label for="answer" class="form-label fw-semibold text-dark mb-3">Answer</label>
         <div class="input-group mb-3">
           <input 
             id="answer"
             type="text" 
             class="form-control form-control-lg"
             bind:value={selectedAnswer}
-            placeholder="ユーザー名やpubkeyを入力してください"
+            placeholder="ユーザー名やnpubを入力してください"
             on:keydown={(e) => e.key === 'Enter' && submitAnswer()}
           />
           <button 
@@ -78,11 +78,11 @@
             on:click={submitAnswer} 
             disabled={!selectedAnswer.trim()}
           >
-            回答する
+            こいつだ！
           </button>
         </div>
         <div class="text-muted small">
-          💡 ヒント: Nostrのユーザー名やpubkeyで回答してください
+          回答フォーマット: name, display_name, 公開鍵(npub, hex)
         </div>
       </div>
     {:else}
@@ -92,21 +92,21 @@
         <div class="card mb-3">
           <div class="card-body">
             <h6 class="card-title text-dark mb-3">正解:</h6>
-                         <div class="d-flex align-items-center gap-2 mb-2">
-               <button 
-                 class="flex-grow-1 bg-light p-2 rounded border user-select-all text-break btn text-start"
-                 style="font-family: monospace; word-break: break-all;"
-                 on:click={copyUserId}
-               >
-                 {quiz.correctUserId}
-               </button>
-              <button 
-                class="btn btn-outline-primary btn-sm" 
-                on:click={copyUserId} 
-                title="コピー"
-              >
+              <div class="d-flex align-items-center gap-2 mb-2">
+                <button 
+                  class="flex-grow-1 bg-light p-2 rounded border user-select-all text-break btn text-start"
+                  style="font-family: monospace; word-break: break-all;"
+                  on:click={copyUserId}
+                >
+                  {quiz.correctUserId}
+                </button>
+                <button 
+                  class="btn btn-outline-primary btn-sm" 
+                  on:click={copyUserId} 
+                  title="コピー"
+                >
                 📋
-              </button>
+                </button>
             </div>
             {#if quiz.userDisplayName}
               <p class="text-muted fst-italic small mb-0">表示名: {quiz.userDisplayName}</p>
@@ -147,7 +147,7 @@
 
     {#if quiz.emojiTags && quiz.emojiTags.length > 0}
       <div class="mt-4 p-3 bg-warning bg-opacity-10 border border-warning border-opacity-25 rounded">
-        <h6 class="text-warning-emphasis mb-3">🎨 使用されているカスタム絵文字</h6>
+        <h6 class="text-warning-emphasis mb-3">使用されているカスタム絵文字</h6>
         <div class="d-flex flex-wrap gap-2">
           {#each quiz.emojiTags as tag}
             <span class="badge bg-warning text-dark">:{tag[1]}:</span>

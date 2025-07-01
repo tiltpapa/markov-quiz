@@ -1,19 +1,19 @@
-# 🎯 Nostr マルコフ連鎖クイズ
+# Nostr マルコフ連鎖クイズ
 
 Nostr上のユーザーの投稿をマルコフ連鎖で解析し、生成された文章から元のユーザーを当てるクイズゲームです。
 
-## 🌟 特徴
+## 特徴
 
 - **Webアプリ**: GitHub Pagesでいつでもクイズに挑戦
 - **自動運用**: GitHub Actionsでbot機能を自動実行
 - **透明性**: 許可ユーザーリストやシステム情報を公開
 - **プライバシー重視**: 許可したユーザーのみクイズ対象
 
-## 🚀 アクセス
+## アクセス
 
 **クイズで遊ぶ**: https://tiltpapa.github.io/markov-quiz/
 
-## 🎮 使い方
+## 使い方
 
 ### ユーザーとして参加
 1. Nostr上でbotに「OK」とリプライして参加許可
@@ -28,7 +28,7 @@ GitHub Actionsのsecretsに以下を設定：
 - `LISTEN_RELAY`: 監視するリレーURL  
 - `PUBLISH_RELAYS`: 投稿先リレーURL（スペース区切り）
 
-## 📁 プロジェクト構成
+## プロジェクト構成
 
 ```
 markov-quiz/
@@ -56,7 +56,7 @@ markov-quiz/
 └── index.html         # Webアプリ用HTML
 ```
 
-## 🔄 動作フロー
+## 動作フロー
 
 ### 自動運用（GitHub Actions）
 1. **毎日JST 9:00**: 新しいクイズを生成・投稿
@@ -68,7 +68,7 @@ markov-quiz/
 - ✅ データは透明化（static/data/で公開）
 - ✅ セルフホストランナーで安全実行
 
-## 🛠️ 開発
+## 開発
 
 ### 依存関係インストール
 ```bash
@@ -98,7 +98,7 @@ npm run bot:generate
 npm run bot:listen
 ```
 
-## 📊 技術スタック
+## 技術スタック
 
 - **Frontend**: Svelte + Vite
 - **Backend**: Node.js + TypeScript
@@ -106,7 +106,3 @@ npm run bot:listen
 - **マルコフ連鎖**: markov-strings
 - **日本語処理**: budoux
 - **デプロイ**: GitHub Pages + GitHub Actions
-
-## 📝 ライセンス
-
-ISC License
