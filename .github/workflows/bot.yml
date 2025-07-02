@@ -109,7 +109,7 @@ jobs:
           }
 
   reply-listener:
-    if: github.event_name == 'schedule' && github.event.schedule == '55 * * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'listen' || github.event.inputs.action == 'both'))
+    if: github.event_name == 'schedule' && github.event.schedule == '25,55 * * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'listen' || github.event.inputs.action == 'both'))
     runs-on: self-hosted
     steps:
       - name: Checkout repository
