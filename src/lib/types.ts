@@ -1,3 +1,5 @@
+import type { WindowNostr } from 'nostr-tools/nip07';
+
 export interface AllowedUsers {
     [userId: string]: string;
 }
@@ -21,4 +23,11 @@ export interface QuizData {
     display_name?: string;
     npub: string;
   };
+}
+
+// NIP-07 Window extension
+declare global {
+  interface Window {
+    nostr?: WindowNostr;
+  }
 } 

@@ -88,7 +88,7 @@
             </p>
             <p class="text-muted small mb-0">
               このクイズはNostr上のユーザーの投稿をマルコフ連鎖で解析して作成されています。<br>
-              参加を希望される場合は、botに「OK」とリプライしましょう→<a href="https://nostter.app/npub1mark0nage0ndaln42e5c4n374xxkypqweds9kel286hreg58ktfsrh4rgl" target="_blank" rel="noopener">管理bot</a>
+              参加を希望される場合は、<a href="https://nostter.app/npub1mark0nage0ndaln42e5c4n374xxkypqweds9kel286hreg58ktfsrh4rgl" target="_blank" rel="noopener">管理bot</a>に「OK」とリプライしましょう
             </p>
           </div>
           
@@ -107,7 +107,7 @@
                 <div class="col-md-6">
                   <div class="card bg-light border">
                     <div class="card-body py-2 d-flex justify-content-between align-items-center">
-                      <span class="fw-medium text-secondary">最終更新:</span>
+                      <span class="fw-medium text-secondary">許可リスト最終更新:</span>
                       <span class="fw-bold text-dark small">{new Date(lastSyncInfo.lastUpdate).toLocaleString('ja')}</span>
                     </div>
                   </div>

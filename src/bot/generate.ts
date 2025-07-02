@@ -4,12 +4,12 @@ import fs from 'fs';
 import path from 'path';
 
 export const generateQuizForBot = async () => {
-  console.log('🎯 クイズ生成を開始します...');
+  console.log('クイズ生成を開始します...');
   
   // ユーザーデータを読み込み
   const userData = await loadUserData();
-  console.log(`📋 許諾リスト: ${Object.keys(userData.allowedUsers).length}ユーザー`);
-  console.log(`🚫 拒否リスト: ${Object.keys(userData.denyUsers).length}ユーザー`);
+  console.log(`許諾リスト: ${Object.keys(userData.allowedUsers).length}ユーザー`);
+  console.log(`拒否リスト: ${Object.keys(userData.denyUsers).length}ユーザー`);
 
   if (Object.keys(userData.allowedUsers).length === 0) {
     throw new Error('許諾リストにユーザーが存在しません');
@@ -20,7 +20,7 @@ export const generateQuizForBot = async () => {
     relays: [LISTEN_RELAY],
     userData,
     questionsCount: 5,
-    eventsToFetch: 10000
+    eventsToFetch: 20000
   });
 
   if (!quizData) {
@@ -43,9 +43,9 @@ export const generateQuizForBot = async () => {
   const legacyQuizFilePath = path.join(dataDir, 'quiz.json');
   fs.writeFileSync(legacyQuizFilePath, JSON.stringify(quizData, null, 2), 'utf-8');
   
-  console.log(`💾 クイズデータを保存しました: ${quizFileName}`);
-  console.log(`🎮 問題数: ${quizData.questions.length}`);
-  console.log(`👤 正解ユーザー: ${quizData.userInfo.id.slice(0, 8)}...`);
+  console.log(`クイズデータを保存しました: ${quizFileName}`);
+  console.log(`問題数: ${quizData.questions.length}`);
+  console.log(`正解ユーザー: ${quizData.userInfo.id.slice(0, 8)}...`);
 
-  console.log('✨ クイズ生成が完了しました');
+  console.log('クイズ生成が完了しました');
 }; 

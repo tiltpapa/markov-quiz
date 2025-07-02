@@ -1,6 +1,8 @@
 import { loadUserData, saveUserData, loadLastSince, saveLastSince, LISTEN_RELAY, sendReply, getBotPublicKey, connectToRelay, getPrivateKey } from '../lib/nostr.js';
-import { Event, Filter, verifyEvent } from 'nostr-tools';
+import { Event, Filter, Relay, verifyEvent } from 'nostr-tools';
 import { UserData } from '../lib/types.js';
+import { NostrFetcher } from 'nostr-fetch';
+import WebSocket from 'ws';
 
 const handleReply = async (event: Event, privateKey: string, userData: UserData) => {
   const userPubkey = event.pubkey;
@@ -48,54 +50,84 @@ const handleReply = async (event: Event, privateKey: string, userData: UserData)
 };
 
 export const listenReplies = async () => {
-  const userData = await loadUserData();
-  const privateKey = getPrivateKey(); // 環境変数から取得
-  const botPubkey = getBotPublicKey(privateKey);
-
-  // 許諾リスト整理開始の通知
-  console.log('許諾リスト整理を開始します...');
-  console.log(`📋 許諾リスト: ${Object.keys(userData.allowedUsers).length}ユーザー`);
-  console.log(`🚫 拒否リスト: ${Object.keys(userData.denyUsers).length}ユーザー`);
+  console.log('=== 許諾リスト整理開始 ===');
   
-  // 最後にreqした日付を呼び出す
-  const filter: Filter = {
-    kinds: [1],
-    '#p': [botPubkey],
-  };
-  
-  const lastSince = await loadLastSince();
-  filter.since = lastSince;
-  console.log(`前回取得時刻: ${new Date(lastSince * 1000).toLocaleString('ja')}`);
+  try {
+    const userData = await loadUserData();
+    // console.log('✓ ユーザーデータ読み込み完了');
+    const privateKey = getPrivateKey(); // 環境変数から取得
+    // console.log('✓ プライベートキー取得完了');
+    const botPubkey = getBotPublicKey(privateKey);
+    // console.log(`✓ ボットの公開キー: ${botPubkey}`);
+    const lastSince = await loadLastSince();
+    // console.log('✓ lastSince読み込み完了');
 
-  const relay = await connectToRelay(LISTEN_RELAY);
-  console.log(`リレー ${LISTEN_RELAY} に接続しました。`);
+    // 許諾リスト整理開始の通知
+    console.log(`許諾リスト: ${Object.keys(userData.allowedUsers).length}ユーザー`);
+    console.log(`拒否リスト: ${Object.keys(userData.denyUsers).length}ユーザー`);
+    
+    // デバッグ用：現在時刻とlastSinceの比較
+    const nowfortest = Math.floor(Date.now() / 1000);
+    console.log(`現在時刻: ${new Date(nowfortest * 1000).toLocaleString('ja')} (${nowfortest})`);
+    console.log(`前回取得時刻: ${new Date(lastSince * 1000).toLocaleString('ja')} (${lastSince})`);
+    console.log(`時間差: ${(nowfortest - lastSince) / 60} 分`);
+    
+    // NostrFetcherを初期化
+    const fetcher = NostrFetcher.init({ webSocketConstructor: WebSocket });
+    
+    // フィルター設定
+    const filter = {
+      kinds: [1],
+      '#p': [botPubkey],
+      since: lastSince
+    };
+    
+    // console.log('使用するフィルター:', JSON.stringify(filter, null, 2));
+    console.log(`リレーURL: ${LISTEN_RELAY}`);
 
-  // ボット宛てのリプライを購読
-  const sub = relay.subscribe([
-    filter
-  ], {
-    onevent(event) {
-      console.log(`リプライを受信: ${event.pubkey.slice(0, 8)}... -> ${event.content.slice(0, 20)}...`);
+    // console.log('ボット宛てのリプライを取得します...');
+    
+    // ボット宛てのリプライを取得（最大1000件）
+    const events = await fetcher.fetchLatestEvents(
+      [LISTEN_RELAY],
+      filter,
+      1000
+    );
+    
+    console.log(`取得完了: ${events.length}件のイベント`);
+    
+    if (events.length === 0) {
+      console.log('ボット宛てのリプライが見つかりませんでした。');
+    } else {
+      console.log('取得されたイベントを処理します...');
       
-      // イベントの署名検証を実行
-      const isValid = verifyEvent(event);
-      if (!isValid) {
-        // console.log(`無効な署名のイベントを無視: ${event.id.slice(0, 8)}... from ${event.pubkey.slice(0, 8)}...`);
-        return;
+      let processedCount = 0;
+      for (const event of events) {
+        processedCount++;
+        console.log(`[${processedCount}/${events.length}] リプライを処理: ${event.pubkey.slice(0, 8)}... -> ${event.content.slice(0, 50)}...`);
+        // console.log(`  作成日時: ${new Date(event.created_at * 1000).toLocaleString('ja')}`);
+        // console.log(`  イベントID: ${event.id.slice(0, 8)}...`);
+        
+        // イベントの署名検証を実行
+        const isValid = verifyEvent(event);
+        // console.log(`  署名検証: ${isValid ? 'OK' : 'NG'}`);
+        
+        if (isValid) {
+          await handleReply(event, privateKey, userData);
+        } else {
+          // console.log('  署名検証に失敗したため、このイベントをスキップします');
+        }
       }
       
-      // console.log(`イベント署名検証成功: ${event.id.slice(0, 8)}...`);
-      handleReply(event, privateKey, userData);
-    },
-    oneose() {
-      console.log('購読終了（End of Stored Events）。');
-      sub.close();
-      relay.close();
+      console.log(`${processedCount}件のイベント処理完了`);
     }
-  });
 
-  // 現在の日時記録
-  const now = Math.floor(Date.now() / 1000);
-  await saveLastSince(now);
-  console.log('許諾リスト整理が完了しました。');
+    // 現在の日時記録
+    const now = Math.floor(Date.now() / 1000);
+    await saveLastSince(now);
+    console.log('=== 許諾リスト整理完了 ===');
+    
+  } catch (error) {
+    console.error('処理中にエラーが発生しました:', error);
+  }
 }; 

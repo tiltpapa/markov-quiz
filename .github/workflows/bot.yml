@@ -7,11 +7,11 @@ on:
       - 'src/bot/**'
       - 'src/lib/**'
       - '.github/workflows/bot.yml'
-#  schedule:
+  schedule:
     # JST 0:00 と 12:00 (UTC 15:00 と 3:00) にクイズ生成
-#    - cron: '0 15,3 * * *'
-    # 1時間おきにリプライ監視（毎時55分に実行してクイズ生成より先に実行）
-#    - cron: '55 * * * *'
+    - cron: '0 15,3 * * *'
+    # 30分おきにリプライ監視（毎時25,55分に実行してクイズ生成より先に実行）
+    - cron: '25,55 * * * *'
   workflow_dispatch:
     inputs:
       action:
@@ -75,7 +75,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -109,7 +109,7 @@ jobs:
           }
 
   reply-listener:
-    if: github.event_name == 'schedule' && github.event.schedule == '55 * * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'listen' || github.event.inputs.action == 'both'))
+    if: github.event_name == 'schedule' && github.event.schedule == '25,55 * * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'listen' || github.event.inputs.action == 'both'))
     runs-on: self-hosted
     steps:
       - name: Checkout repository
@@ -161,6 +161,8 @@ jobs:
         with:
           relays: ${{ vars.PUBLISH_RELAYS_ACTION }}
           private-key: ${{ secrets.NOSTR_PRIVATE_KEY }}
+          tags: |
+            - ["t", "markov_quiz"]
           content: |
             新しいマルコフ連鎖クイズが出題されました！
             
@@ -169,4 +171,4 @@ jobs:
             出題対象にされてもよいという方は "OK" とリプライ
             出題対象から外してほしい方は "NG" とリプライ
             
-            #quiz #マルコフ連鎖 
+            #markov_quiz

@@ -143,15 +143,59 @@ export const generateQuizData = async (config: QuizGenerationConfig): Promise<Qu
   const markov = new MarkovChain(contents);
 
   // 例文を生成
-  const questions: string[] = [];
-  for (let i = 0; i < questionsCount; i++) {
+  const generationCount = questionsCount >= 20 ? questionsCount * 1.5 : 20; // 最低20回、questionsCount>=20なら30回
+  const allQuestions: string[] = [];
+  
+  for (let i = 0; i < generationCount; i++) {
     const sentence = markov.generate();
-    if (!sentence || sentence.length === 0) {
-      console.log('例文生成に失敗しました。');
-      return null;
+    if (sentence && sentence.length > 0) {
+      const cleanSentence = sentence.replace(/ /g,'');
+      // 1文字以上のもののみ追加
+      if (cleanSentence.length > 1) {
+        allQuestions.push(cleanSentence);
+      }
     }
-    questions.push(sentence.replace(/ /g,''));
   }
+  
+  if (allQuestions.length === 0) {
+    console.log('有効な例文が生成できませんでした。');
+    return null;
+  }
+  
+  // 文字長でソート
+  allQuestions.sort((a, b) => a.length - b.length);
+  
+  // 選択する個数を計算
+  const shortCount = Math.floor(questionsCount * 0.4);
+  const longCount = questionsCount - shortCount;
+  
+  const questions: string[] = [];
+  
+  // 短い方から選択
+  for (let i = 0; i < Math.min(shortCount, allQuestions.length); i++) {
+    questions.push(allQuestions[i]);
+  }
+  
+  // 長い方から選択
+  const startIndex = Math.max(0, allQuestions.length - longCount);
+  for (let i = startIndex; i < allQuestions.length; i++) {
+    if (!questions.includes(allQuestions[i])) {
+      questions.push(allQuestions[i]);
+    }
+  }
+  /*
+  // 足りない場合は長い方から追加
+  while (questions.length < questionsCount && questions.length < allQuestions.length) {
+    for (let i = allQuestions.length - 1; i >= 0; i--) {
+      if (!questions.includes(allQuestions[i])) {
+        questions.push(allQuestions[i]);
+        break;
+      }
+    }
+  }
+  */
+  // questionsCount個に調整
+  // questions.splice(questionsCount);
   
   const quizTags: string[][] = [];
   questions.forEach((sentence) => {
