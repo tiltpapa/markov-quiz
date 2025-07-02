@@ -102,6 +102,7 @@ export const listenReplies = async () => {
       console.log('取得されたイベントを処理します...');
       
       let processedCount = 0;
+      events.sort((a, b) => a.created_at - b.created_at);
       for (const event of events) {
         processedCount++;
         console.log(`[${processedCount}/${events.length}] リプライを処理: ${event.pubkey.slice(0, 8)}... -> ${event.content.slice(0, 50)}...`);
