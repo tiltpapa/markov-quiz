@@ -63,13 +63,13 @@ jobs:
             git push
           fi
 
-  # 開発ブランチ用のクイズ生成（ファイル表示のみ）
-  quiz-generate-dev:
+  # 開発ブランチ用のCLI実行（ファイル表示のみ）
+  cli-dev:
     if: github.event_name == 'push' && github.ref != 'refs/heads/main'
     runs-on: self-hosted
     steps:
-      - name: Test external connection
-        run: curl -I https://www.google.com
+#      - name: Test external connection
+#        run: curl -I https://www.google.com
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -106,7 +106,28 @@ jobs:
           fi
           if [ -f src/data/lastSince.json ]; then
             echo "Last sync:"
-            cat src/data/lastSince.json | head -5
+            cat src/data/lastSince.json
+          fi
+      
+      - name: Listen to replies
+        run: |
+          cp src/data/allowedUsers.json src/data/allowedUsers.json.bak
+          npm run bot:listen
+        env:
+          LISTEN_RELAY: ${{ vars.LISTEN_RELAY }}
+          PUBLISH_RELAYS: ${{ vars.PUBLISH_RELAYS }}
+          NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
+      
+      - name: Show generated users data
+        run: |
+          echo "=== Generated Users Data ==="
+          if [ -f src/data/allowedUsers.json ]; then
+            echo "Allowed users:"
+            diff src/data/allowedUsers.json.bak src/data/allowedUsers.json
+          fi
+          if [ -f src/data/lastSince.json ]; then
+            echo "Last sync:"
+            cat src/data/lastSince.json
           fi
 
   reply-listener:
