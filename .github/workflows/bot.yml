@@ -52,17 +52,16 @@ jobs:
           NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
 
       - name: Commit and push quiz data
-#        shell: pwsh
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add src/data/
-          if (git diff --staged --quiet) {
-            Write-Host "No changes to commit"
-          } else {
-            git commit -m "Update quiz data - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update quiz data - $(date '+%Y-%m-%d %H:%M:%S')"
             git push
-          }
+          fi
 
   # 開発ブランチ用のクイズ生成（ファイル表示のみ）
   quiz-generate-dev:
@@ -92,21 +91,20 @@ jobs:
           NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
 
       - name: Show generated quiz data
-#        shell: pwsh
         run: |
-          Write-Host "=== Generated Quiz Data ==="
-          if (Test-Path src/data/quiz.json) {
-            Write-Host "Quiz data:"
-            Get-Content src/data/quiz.json -Encoding UTF8
-          }
-          if (Test-Path src/data/allowedUsers.json) {
-            Write-Host "Allowed users:"
-            Get-Content src/data/allowedUsers.json -Encoding UTF8 | Select-Object -First 10
-          }
-          if (Test-Path src/data/lastSince.json) {
-            Write-Host "Last sync:"
-            Get-Content src/data/lastSince.json -Encoding UTF8 | Select-Object -First 5
-          }
+          echo "=== Generated Quiz Data ==="
+          if [ -f src/data/quiz.json ]; then
+            echo "Quiz data:"
+            cat src/data/quiz.json
+          fi
+          if [ -f src/data/allowedUsers.json ]; then
+            echo "Allowed users:"
+            cat src/data/allowedUsers.json | head -10
+          fi
+          if [ -f src/data/lastSince.json ]; then
+            echo "Last sync:"
+            cat src/data/lastSince.json | head -5
+          fi
 
   reply-listener:
     if: github.event_name == 'schedule' && github.event.schedule == '25,55 * * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'listen' || github.event.inputs.action == 'both'))
@@ -135,17 +133,16 @@ jobs:
           NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
 
       - name: Commit and push updated data
-#        shell: pwsh
         run: |
           git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add src/data/
-          if (git diff --staged --quiet) {
-            Write-Host "No changes to commit"
-          } else {
-            git commit -m "Update allowed users and last sync - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update allowed users and last sync - $(date '+%Y-%m-%d %H:%M:%S')"
             git push
-          }
+          fi
 
   # Nostrイベント投稿（mainブランチのみ）
   post-to-nostr:
