@@ -23,6 +23,7 @@ on:
         - generate
         - listen
         - both
+        - cli-dev
 
 jobs:
   quiz-generate:
@@ -65,7 +66,7 @@ jobs:
 
   # 開発ブランチ用のCLI実行（ファイル表示のみ）
   cli-dev:
-    if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref != 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'cli-dev')
     runs-on: self-hosted
     steps:
 #      - name: Test external connection
