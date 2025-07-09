@@ -23,6 +23,7 @@ on:
         - generate
         - listen
         - both
+        - cli-dev
 
 jobs:
   quiz-generate:
@@ -63,11 +64,14 @@ jobs:
             git push
           fi
 
-  # 開発ブランチ用のクイズ生成（ファイル表示のみ）
-  quiz-generate-dev:
-    if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+  # 開発ブランチ用のCLI実行（ファイル表示のみ）
+  cli-dev:
+    if: github.event_name == 'push' && github.ref != 'refs/heads/main' || (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'cli-dev')
     runs-on: self-hosted
     steps:
+#      - name: Test external connection
+#        run: curl -I https://www.google.com
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -82,6 +86,27 @@ jobs:
 
       - name: Build bot
         run: npm run build:cli
+
+      - name: Listen to replies
+        run: |
+          cp src/data/allowedUsers.json src/data/allowedUsers.json.bak
+          npm run bot:listen
+        env:
+          LISTEN_RELAY: ${{ vars.LISTEN_RELAY }}
+          PUBLISH_RELAYS: ${{ vars.PUBLISH_RELAYS }}
+          NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
+      
+      - name: Show generated users data
+        run: |
+          echo "=== Generated Users Data ==="
+          if [ -f src/data/allowedUsers.json ]; then
+            echo "Allowed users:"
+            diff src/data/allowedUsers.json.bak src/data/allowedUsers.json >> /dev/stdout || true
+          fi
+          if [ -f src/data/lastSince.json ]; then
+            echo "Last sync:"
+            cat src/data/lastSince.json
+          fi
 
       - name: Generate quiz
         run: npm run bot:generate
@@ -98,14 +123,14 @@ jobs:
             cat src/data/quiz.json
           fi
           if [ -f src/data/allowedUsers.json ]; then
-            echo "Allowed users:"
+            echo -e "\nAllowed users:"
             cat src/data/allowedUsers.json | head -10
           fi
           if [ -f src/data/lastSince.json ]; then
-            echo "Last sync:"
-            cat src/data/lastSince.json | head -5
+            echo -e "\nLast sync:"
+            cat src/data/lastSince.json
           fi
-
+      
   reply-listener:
     if: github.event_name == 'schedule' && github.event.schedule == '25,55 * * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'listen' || github.event.inputs.action == 'both'))
     runs-on: self-hosted
