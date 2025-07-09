@@ -125,7 +125,7 @@ export const listenReplies = async () => {
         if (isValid) {
           await handleReply(event, privateKey, userData);
           // 各リプライ処理の間に短い待機時間を追加（WebSocket接続の競合を避けるため）
-          await new Promise(resolve => setTimeout(resolve, 100));
+          //  await new Promise(resolve => setTimeout(resolve, 100));
         } else {
           console.log('署名検証に失敗したため、このイベントをスキップします');
         }
