@@ -1,7 +1,8 @@
 {
   "allowedUsers": {
-    "7232d725dbbab9c881b2a26af88fd651dd917362a70ec7d3018296c6a22ff54e": "",
-    "5b0790bfc4198678c1a29db80a8f15dabe34ab68abf28ce503d8c184c75d34c2": "4cc5e5ae53942b10da54fca55bfdb1ef2375c4c8feba2dcc8b079fb677eb1dd9"
+    "7232d725dbbab9c881b2a26af88fd651dd917362a70ec7d3018296c6a22ff54e": ""
   },
-  "denyUsers": {}
+  "denyUsers": {
+    "5b0790bfc4198678c1a29db80a8f15dabe34ab68abf28ce503d8c184c75d34c2": "3effbab5708eba961166a9eca70c1846e386cc9bcc2d2311a353bb76c2dd5d99"
+  }
 }
