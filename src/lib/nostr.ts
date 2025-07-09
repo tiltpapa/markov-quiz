@@ -3,6 +3,8 @@ import path from 'node:path';
 import { UserData } from './types.js';
 import { EventTemplate, finalizeEvent, SimplePool, Event, getPublicKey, Relay, Filter } from 'nostr-tools';
 import { hexToBytes } from '@noble/hashes/utils';
+import { useWebSocketImplementation as useWebSocketImplementationPool } from 'nostr-tools/pool';
+import WebSocket from 'ws';
 
 // データディレクトリ（src内）
 const DATA_DIR = path.join(process.cwd(), 'src', 'data');
@@ -113,6 +115,7 @@ export const saveLastSince = async (timestamp: number): Promise<void> => {
 export const publishEvent = async (privateKey: string, event: EventTemplate): Promise<void> => {
   const sk = hexToBytes(privateKey);
   const signedEvent = finalizeEvent(event, sk);
+  useWebSocketImplementationPool(WebSocket);
   const pool = new SimplePool();
   await Promise.all(pool.publish(PUBLISH_RELAYS, signedEvent));
   pool.close(PUBLISH_RELAYS);
