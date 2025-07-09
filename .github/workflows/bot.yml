@@ -123,11 +123,11 @@ jobs:
             cat src/data/quiz.json
           fi
           if [ -f src/data/allowedUsers.json ]; then
-            echo "\nAllowed users:"
+            echo -e "\nAllowed users:"
             cat src/data/allowedUsers.json | head -10
           fi
           if [ -f src/data/lastSince.json ]; then
-            echo "\nLast sync:"
+            echo -e "\nLast sync:"
             cat src/data/lastSince.json
           fi
       
