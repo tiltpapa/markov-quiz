@@ -134,6 +134,7 @@ jobs:
   reply-listener:
     if: github.event_name == 'schedule' && github.event.schedule == '3/5 * * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'listen' || github.event.inputs.action == 'both'))
     runs-on: self-hosted
+    timeout-minutes: 10
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
