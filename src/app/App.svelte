@@ -5,7 +5,6 @@
   
   // 静的データを直接import
   import quizData from '../data/quiz.json';
-  import lastSinceData from '../data/lastSince.json';
   import allowedUsersData from '../data/allowedUsers.json';
 
   let currentQuiz: QuizData | null = null;
@@ -21,7 +20,10 @@
       
       // インポートしたデータを直接使用
       currentQuiz = quizData;
-      lastSyncInfo = lastSinceData;
+      lastSyncInfo = {
+        timestamp: allowedUsersData.timestamp,
+        lastUpdate: allowedUsersData.lastUpdate
+      };
       allowedUsersCount = Object.keys(allowedUsersData.allowedUsers).length;
       
     } catch (err) {
