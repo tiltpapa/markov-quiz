@@ -21,8 +21,8 @@ on:
         type: choice
         options:
         - generate
-        - listen
-        - both
+#        - listen
+#        - both
         - cli-dev
 
 jobs:
@@ -87,26 +87,26 @@ jobs:
       - name: Build bot
         run: npm run build:cli
 
-      - name: Listen to replies
-        run: |
-          cp src/data/allowedUsers.json src/data/allowedUsers.json.bak
-          npm run bot:listen
-        env:
-          LISTEN_RELAY: ${{ vars.LISTEN_RELAY }}
-          PUBLISH_RELAYS: ${{ vars.PUBLISH_RELAYS }}
-          NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
-      
-      - name: Show generated users data
-        run: |
-          echo "=== Generated Users Data ==="
-          if [ -f src/data/allowedUsers.json ]; then
-            echo "Allowed users:"
-            diff src/data/allowedUsers.json.bak src/data/allowedUsers.json >> /dev/stdout || true
-          fi
-          if [ -f src/data/lastSince.json ]; then
-            echo "Last sync:"
-            cat src/data/lastSince.json
-          fi
+#      - name: Listen to replies
+#        run: |
+#          cp src/data/allowedUsers.json src/data/allowedUsers.json.bak
+#          npm run bot:listen
+#        env:
+#          LISTEN_RELAY: ${{ vars.LISTEN_RELAY }}
+#          PUBLISH_RELAYS: ${{ vars.PUBLISH_RELAYS }}
+#          NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
+#      
+#      - name: Show generated users data
+#        run: |
+#          echo "=== Generated Users Data ==="
+#          if [ -f src/data/allowedUsers.json ]; then
+#            echo "Allowed users:"
+#            diff src/data/allowedUsers.json.bak src/data/allowedUsers.json >> /dev/stdout || true
+#          fi
+#          if [ -f src/data/lastSince.json ]; then
+#            echo "Last sync:"
+#            cat src/data/lastSince.json
+#          fi
 
       - name: Generate quiz
         run: npm run bot:generate
@@ -131,44 +131,44 @@ jobs:
             cat src/data/lastSince.json
           fi
       
-  reply-listener:
-    if: github.event_name == 'schedule' && github.event.schedule == '3/5 * * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'listen' || github.event.inputs.action == 'both'))
-    runs-on: self-hosted
-    timeout-minutes: 10
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build bot
-        run: npm run build:cli
-
-      - name: Listen to replies
-        run: npm run bot:listen
-        env:
-          LISTEN_RELAY: ${{ vars.LISTEN_RELAY }}
-          PUBLISH_RELAYS: ${{ vars.PUBLISH_RELAYS }}
-          NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
-
-      - name: Commit and push updated data
-        run: |
-          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add src/data/
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Update allowed users and last sync - $(date '+%Y-%m-%d %H:%M:%S')"
-            git push
-          fi
+#  reply-listener:
+#    if: github.event_name == 'schedule' && github.event.schedule == '3/5 * * * *' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.action == 'listen' || github.event.inputs.action == 'both'))
+#    runs-on: self-hosted
+#    timeout-minutes: 10
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v4
+#
+#      - name: Setup Node.js
+#        uses: actions/setup-node@v4
+#        with:
+#          node-version: '22'
+#          cache: 'npm'
+#
+#      - name: Install dependencies
+#        run: npm ci
+#
+#      - name: Build bot
+#        run: npm run build:cli
+#
+#      - name: Listen to replies
+#        run: npm run bot:listen
+#        env:
+#          LISTEN_RELAY: ${{ vars.LISTEN_RELAY }}
+#          PUBLISH_RELAYS: ${{ vars.PUBLISH_RELAYS }}
+#          NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
+#
+#      - name: Commit and push updated data
+#        run: |
+#          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+#          git config --local user.name "github-actions[bot]"
+#          git add src/data/
+#          if git diff --staged --quiet; then
+#            echo "No changes to commit"
+#          else
+#            git commit -m "Update allowed users and last sync - $(date '+%Y-%m-%d %H:%M:%S')"
+#            git push
+#          fi
 
   # Nostrイベント投稿（mainブランチのみ）
   post-to-nostr:
@@ -176,8 +176,8 @@ jobs:
     needs: quiz-generate
     runs-on: self-hosted
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+#      - name: Checkout repository
+#        uses: actions/checkout@v4
 
       - name: Post quiz to Nostr
         uses: snow-actions/nostr@v1.8.1
