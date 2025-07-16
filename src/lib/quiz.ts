@@ -135,9 +135,14 @@ export const generateQuizData = async (config: QuizGenerationConfig): Promise<Qu
   }  
 
   // emojiタグを取り出す
-  const emojiTags = events.filter((event) => event.tags.length > 1)
+  const emojiTagsAll = events.filter((event) => event.tags.length > 1)
                     .flatMap((event) => event.tags)
                     .filter((tag) => tag[0] === "emoji")
+  
+  // tag[1]をキーとして重複する要素を除く
+  const emojiTags = Array.from(
+    new Map(emojiTagsAll.map(tag => [tag[1], tag])).values()
+  );
   
   // マルコフ連鎖の構築
   const markov = new MarkovChain(contents);
