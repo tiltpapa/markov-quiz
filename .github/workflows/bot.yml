@@ -7,7 +7,7 @@ on:
       - 'src/bot/**'
       - 'src/lib/**'
       - '.github/workflows/bot.yml'
-  schedule:
+#  schedule:
     # JST 0:00 と 12:00 (UTC 15:00 と 3:00) にクイズ生成
 #    - cron: '0 15,3 * * *'
     # 毎時3分から5分おきにリプライ監視
@@ -32,6 +32,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
