@@ -64,6 +64,7 @@ jobs:
           path: './dist/web'
 
   deploy:
+    if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ needs.build.outputs.branch-name == 'main' && steps.deployment.outputs.page_url || format('{0}{1}/', steps.deployment.outputs.page_url, needs.build.outputs.branch-name) }}

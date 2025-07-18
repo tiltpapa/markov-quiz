@@ -7,9 +7,9 @@ on:
       - 'src/bot/**'
       - 'src/lib/**'
       - '.github/workflows/bot.yml'
-  schedule:
+#  schedule:
     # JST 0:00 と 12:00 (UTC 15:00 と 3:00) にクイズ生成
-    - cron: '0 15,3 * * *'
+#    - cron: '0 15,3 * * *'
     # 毎時3分から5分おきにリプライ監視
 #    - cron: '3/5 * * * *'
   workflow_dispatch:
@@ -50,7 +50,7 @@ jobs:
       - name: Generate quiz
         run: npm run bot:generate
         env:
-          LISTEN_RELAY: ${{ vars.LISTEN_RELAY }}
+          LISTEN_RELAYS: ${{ vars.PUBLISH_RELAYS }}
           PUBLISH_RELAYS: ${{ vars.PUBLISH_RELAYS }}
           NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
 
@@ -113,7 +113,7 @@ jobs:
       - name: Generate quiz
         run: npm run bot:generate
         env:
-          LISTEN_RELAY: ${{ vars.LISTEN_RELAY }}
+          LISTEN_RELAYS: ${{ vars.PUBLISH_RELAYS }}
           PUBLISH_RELAYS: ${{ vars.PUBLISH_RELAYS }}
           NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
 
