@@ -1,4 +1,4 @@
-import { loadUserData, saveUserData, loadLastSince, saveLastSince, LISTEN_RELAY, sendReply, getBotPublicKey, connectToRelay, getPrivateKey } from '../lib/nostr.js';
+import { loadUserData, saveUserData, loadLastSince, saveLastSince, LISTEN_RELAYS, sendReply, getBotPublicKey, connectToRelay, getPrivateKey } from '../lib/nostr.js';
 import { Event, Filter, Relay, verifyEvent } from 'nostr-tools';
 import { UserData } from '../lib/types.js';
 import { NostrFetcher } from 'nostr-fetch';
@@ -93,13 +93,13 @@ export const listenReplies = async () => {
     };
     
     // console.log('使用するフィルター:', JSON.stringify(filter, null, 2));
-    console.log(`リレーURL: ${LISTEN_RELAY}`);
+    console.log(`リレーURL: ${LISTEN_RELAYS}`);
 
     // console.log('ボット宛てのリプライを取得します...');
     
     // ボット宛てのリプライを取得（最大1000件）
     const events = await fetcher.fetchLatestEvents(
-      [LISTEN_RELAY],
+      LISTEN_RELAYS,
       filter,
       1000
     );

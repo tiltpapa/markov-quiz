@@ -12,7 +12,7 @@ const ALLOWED_USERS_FILE = path.join(DATA_DIR, 'allowedUsers.json');
 const LAST_SINCE_FILE = path.join(DATA_DIR, 'lastSince.json');
 
 // 環境変数からリレー情報を取得
-export const LISTEN_RELAY = process.env.LISTEN_RELAY || 'wss://relay.damus.io';
+export const LISTEN_RELAYS = process.env.LISTEN_RELAYS?.split(' ') || ['wss://relay.damus.io'];
 export const PUBLISH_RELAYS = process.env.PUBLISH_RELAYS?.split(' ') || ['wss://relay.damus.io'];
 
 // 環境変数からプライベートキーを取得

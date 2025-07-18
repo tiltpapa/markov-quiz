@@ -1,5 +1,5 @@
 import { generateQuizData } from '../lib/quiz.js';
-import { loadUserData, saveUserData, LISTEN_RELAY, getPrivateKey, generateQuizFileName } from '../lib/nostr.js';
+import { loadUserData, saveUserData, LISTEN_RELAYS, getPrivateKey, generateQuizFileName } from '../lib/nostr.js';
 import fs from 'fs';
 import path from 'path';
 
@@ -17,7 +17,7 @@ export const generateQuizForBot = async () => {
 
   // クイズデータを生成
   const quizData = await generateQuizData({
-    relays: [LISTEN_RELAY],
+    relays: LISTEN_RELAYS,
     userData,
     questionsCount: 5,
     eventsToFetch: 20000

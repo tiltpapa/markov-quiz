@@ -50,7 +50,7 @@ jobs:
       - name: Generate quiz
         run: npm run bot:generate
         env:
-          LISTEN_RELAY: ${{ vars.LISTEN_RELAY }}
+          LISTEN_RELAYS: ${{ vars.PUBLISH_RELAYS }}
           PUBLISH_RELAYS: ${{ vars.PUBLISH_RELAYS }}
           NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
 
@@ -113,7 +113,7 @@ jobs:
       - name: Generate quiz
         run: npm run bot:generate
         env:
-          LISTEN_RELAY: ${{ vars.LISTEN_RELAY }}
+          LISTEN_RELAYS: ${{ vars.PUBLISH_RELAYS }}
           PUBLISH_RELAYS: ${{ vars.PUBLISH_RELAYS }}
           NOSTR_PRIVATE_KEY: ${{ secrets.NOSTR_PRIVATE_KEY }}
 
