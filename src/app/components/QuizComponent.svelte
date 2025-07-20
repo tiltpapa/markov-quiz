@@ -38,7 +38,7 @@
   });
 
   const formatDate = (timestamp: number) => {
-    return new Date(timestamp).toLocaleString('ja');
+    return new Date(timestamp).toLocaleString('ja', { timeZone: 'JST' });
   };
 
   const submitAnswer = async () => {
