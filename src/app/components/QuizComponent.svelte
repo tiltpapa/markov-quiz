@@ -156,8 +156,8 @@ https://tiltpapa.github.io/markov-quiz/
       
     } catch (error) {
       console.error('Nostr投稿エラー:', error);
-      alert('投稿に失敗しました。クリップボードにコピーしました。');
-      await copyToClipboard();
+      alert('投稿に失敗した可能性があります。\n確認してください。');
+//    await copyToClipboard();
     } finally {
       isSharing = false;
     }
