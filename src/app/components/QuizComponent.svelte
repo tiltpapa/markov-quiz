@@ -210,7 +210,6 @@ https://tiltpapa.github.io/markov-quiz/
             type="text" 
             class="form-control form-control-lg"
             bind:value={selectedAnswer}
-            placeholder="ユーザー名やnpubを入力してください"
             on:keydown={(e) => e.key === 'Enter' && submitAnswer()}
           />
           <button 
@@ -223,8 +222,16 @@ https://tiltpapa.github.io/markov-quiz/
           </button>
         </div>
         <div class="text-muted small">
-          回答フォーマット: name, display_name, 公開鍵(npub, hex)
+          回答フォーマット: 
+          {#if quiz.userInfo.name}name, {/if}
+          {#if quiz.userInfo.display_name}display_name, {/if}
+          公開鍵(npub, hex)
         </div>
+        {#if !quiz.userInfo.name && !quiz.userInfo.display_name}
+          <div class="text-warning small mt-1">
+            プロフィール情報の取得に失敗しました
+          </div>
+        {/if}
       </div>
     {:else if showIncorrectResult}
       <div class="border border-warning border-2 rounded p-4 bg-warning bg-opacity-10">
