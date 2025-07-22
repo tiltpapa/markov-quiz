@@ -17,6 +17,7 @@
     "build:github": "vite build --base /markov-quiz/",
     "bot:listen": "npm run build:cli && node dist/cli/bot/cli.js listen",
     "bot:generate": "npm run build:cli && node dist/cli/bot/cli.js generate",
+    "bot:fetch-users": "npm run build:cli && node dist/cli/bot/cli.js fetch-users",
     "clean": "rm -rf dist"
   },
   "exports": {

@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { generateQuizForBot } from './generate.js';
 import { listenReplies } from './listen.js';
+import { fetchUsersInfo } from './fetch-users-info.js';
 
 const program = new Command();
 
@@ -33,6 +34,20 @@ program
       process.exit(0);
     } catch (error) {
       console.error('❌ リプライ監視でエラーが発生しました:', error);
+      process.exit(1);
+    }
+  });
+
+program
+  .command('fetch-users')
+  .description('許諾リストのユーザーのプロフィール情報を取得する')
+  .action(async () => {
+    try {
+      await fetchUsersInfo();
+      console.log('✅ ユーザー情報取得が完了しました');
+      process.exit(0);
+    } catch (error) {
+      console.error('❌ ユーザー情報取得でエラーが発生しました:', error);
       process.exit(1);
     }
   });
