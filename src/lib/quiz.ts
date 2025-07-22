@@ -7,6 +7,8 @@ import { MarkovChain } from 'kurwov';
 import { UserData } from './types.js';
 import { getRecentQuizUsers } from './nostr.js';
 import WebSocket from 'ws';
+import fs from 'node:fs';
+import path from 'node:path';
 
 export interface QuizData {
   questions: string[];
@@ -27,6 +29,18 @@ export interface QuizGenerationConfig {
   eventsToFetch?: number;
 }
 
+interface UsersInfoData {
+  usersInfo: {
+    [userId: string]: {
+      id: string;
+      name?: string;
+      display_name?: string;
+      picture?: string;
+      npub: string;
+    };
+  };
+}
+
 const sanitizeContent = (content: string): string => {
   // URLやnostr URIを除去
   return content
@@ -34,6 +48,25 @@ const sanitizeContent = (content: string): string => {
     .replace(/nostr:\S+/g, '')
     .replace(/:\w+:/g, (match) => match) // カスタム絵文字を保持
     .trim();
+};
+
+const loadUsersInfo = (): UsersInfoData['usersInfo'] | null => {
+  try {
+    const dataDir = path.join(process.cwd(), 'src', 'data');
+    const usersInfoPath = path.join(dataDir, 'allowedUsersInfo.json');
+    
+    if (!fs.existsSync(usersInfoPath)) {
+      console.log('allowedUsersInfo.jsonが見つかりません');
+      return null;
+    }
+    
+    const data = fs.readFileSync(usersInfoPath, 'utf-8');
+    const parsedData: UsersInfoData = JSON.parse(data);
+    return parsedData.usersInfo || null;
+  } catch (error) {
+    console.log('allowedUsersInfo.jsonの読み込みに失敗しました:', error);
+    return null;
+  }
 };
 
 export const generateQuizData = async (config: QuizGenerationConfig): Promise<QuizData | null> => {
@@ -65,41 +98,22 @@ export const generateQuizData = async (config: QuizGenerationConfig): Promise<Qu
   // NostrFetcherを初期化（WebSocketを一度だけ使用）
   const fetcher = NostrFetcher.init({webSocketConstructor: WebSocket});
 
-  // ユーザーのプロフィール情報を取得
+  // ユーザーのプロフィール情報をallowedUsersInfo.jsonから取得
   let userInfo: { id: string; name?: string; display_name?: string; npub: string };
-  try {
-    const profileEvents = await fetcher.fetchLatestEvents(
-      relays,
-      { kinds: [0], authors: [randomUserId] },
-      1
-    );
-
-    if (profileEvents.length > 0) {
-      try {
-        const profileData = JSON.parse(profileEvents[0].content);
-        userInfo = {
-          id: randomUserId,
-          name: profileData.name,
-          display_name: profileData.display_name,
-          npub: nip19.npubEncode(randomUserId)
-        };
-        console.log(`ユーザー情報取得成功: ${profileData.name || profileData.display_name || 'Unknown'}`);
-      } catch (error) {
-        console.log('プロフィール情報のパースに失敗しました');
-        userInfo = {
-          id: randomUserId,
-          npub: nip19.npubEncode(randomUserId)
-        };
-      }
-    } else {
-      console.log('プロフィール情報が見つかりませんでした');
-      userInfo = {
-        id: randomUserId,
-        npub: nip19.npubEncode(randomUserId)
-      };
-    }
-  } catch (error) {
-    console.log('プロフィール情報の取得に失敗しました:', error);
+  const usersInfoData = loadUsersInfo();
+  
+  if (usersInfoData && usersInfoData[randomUserId]) {
+    const savedUserInfo = usersInfoData[randomUserId];
+    userInfo = {
+      id: randomUserId,
+      name: savedUserInfo.name,
+      display_name: savedUserInfo.display_name,
+      npub: savedUserInfo.npub
+    };
+    console.log(`ユーザー情報取得成功（保存済み）: ${savedUserInfo.name || savedUserInfo.display_name || 'Unknown'}`);
+  } else {
+    // フォールバック：allowedUsersInfo.jsonに情報がない場合は基本情報のみ
+    console.log('保存済みプロフィール情報が見つかりませんでした、基本情報を使用します');
     userInfo = {
       id: randomUserId,
       npub: nip19.npubEncode(randomUserId)
