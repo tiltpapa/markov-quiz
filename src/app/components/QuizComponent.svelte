@@ -5,6 +5,7 @@
   import { quizStorage } from '../../lib/storage';
   import EmojiText from './EmojiText.svelte';
   import { SimplePool, type EventTemplate } from 'nostr-tools';
+  import '@konemono/nostr-web-components';
 
   export let quiz: QuizData;
 
@@ -272,7 +273,7 @@ https://tiltpapa.github.io/markov-quiz/
                   {quiz.userInfo.display_name || quiz.userInfo.name}
               {/if}
             </h6>
-            <p class="text-muted small mb-0">{quiz.userInfo.npub}</p>
+            <nostr-profile user={quiz.userInfo.npub} display="compact"></nostr-profile>
           </div>
         </div>
 
