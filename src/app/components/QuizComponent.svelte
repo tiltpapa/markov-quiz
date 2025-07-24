@@ -5,7 +5,6 @@
   import { quizStorage } from '../../lib/storage';
   import EmojiText from './EmojiText.svelte';
   import { SimplePool, type EventTemplate } from 'nostr-tools';
-  import '@konemono/nostr-web-components';
 
   export let quiz: QuizData;
 
