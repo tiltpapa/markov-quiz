@@ -11,7 +11,7 @@
       "id": "e62f27d2814a25171c466d2d7612ad1a066db1362b4e259db5c076f9e6b21cb7",
       "npub": "npub1uchj055pfgj3w8zxd5khvy4drgrxmvfk9d8zt8d4cpm0ne4jrjms30u6q9",
       "name": "uchijo",
-      "display_name": "uchijo",
+      "display_name": "tempura",
       "picture": "https://www.uchijo.com/icon.jpg"
     },
     "b3e43e8cc7e6dff23a33d9213a3e912d895b1c3e4250240e0c99dbefe3068b5f": {
@@ -227,8 +227,8 @@
     "df8f0a640c3ffd09e293999acfa399d0574c8501fcdabceca5072ee2057d87a5": {
       "id": "df8f0a640c3ffd09e293999acfa399d0574c8501fcdabceca5072ee2057d87a5",
       "npub": "npub1m78s5eqv8l7snc5nnxdvlgue6pt5epgplndtem99quhwyptas7jss2qx53",
-      "name": "Szachik Sabizański",
-      "picture": "https://mymt.casa/icons/1.webp"
+      "name": "Shachiclone",
+      "picture": "https://mymt.casa/icons/2.avif"
     },
     "0f38afb23cec30570ee64f9a4aa099229395ec3371c5fe867e09c9111480015d": {
       "id": "0f38afb23cec30570ee64f9a4aa099229395ec3371c5fe867e09c9111480015d",
@@ -236,6 +236,13 @@
       "name": "lkjsxc",
       "display_name": "lkjsxc / スク",
       "picture": "https://raw.githubusercontent.com/lkjsxc/mono/refs/heads/main/media/icon_0512.png"
+    },
+    "7b73abe05caa0533e54770cd22203c032ee7c128502d2d54560f8e91a4985287": {
+      "id": "7b73abe05caa0533e54770cd22203c032ee7c128502d2d54560f8e91a4985287",
+      "npub": "npub10de6hczu4gzn8e28wrxjygpuqvhw0sfg2qkj64zkp78frfyc22rslyes37",
+      "name": "yukimikudayo",
+      "display_name": "雪乃みくだよ",
+      "picture": "https://image.nostr.build/aefbd12fd73b1ef78ff443db4e995d9df13654ed3bfa69a2d9115fbf44b3f2dc.png"
     }
   }
 }
