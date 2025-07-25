@@ -1,11 +1,18 @@
 <script lang="ts">
-  import type { QuizData } from '../../lib/types.ts';
+  import type { QuizData, UserInfo } from '../../lib/types.ts';
   import type { QuizAttempt } from '../../lib/storage';
+  import allowedUsersInfo from '../../data/allowedUsersInfo.json';
 
   export let quiz: QuizData;
   export let quizAttempt: QuizAttempt | null;
   export let selectedAnswer: string;
   export let onSubmit: () => void;
+
+  const suggestionData = Object.values(allowedUsersInfo.usersInfo).map((user: UserInfo) => ({
+    value: user.id,
+    label: `${user.display_name || user.name || 'Unknown'} @${user.name || ''}`,
+    html: `<img src="${user.picture || ''}" style="width: 24px; height: 24px; border-radius: 50%; margin-right: 8px;" onerror="this.style.display='none'" /><span>${user.display_name || user.name || 'Unknown'} @${user.name || ''}</span>`
+  }));
 </script>
 
 <div class="bg-light border border-light-subtle rounded p-4">

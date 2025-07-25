@@ -4,18 +4,7 @@ import { nip19 } from 'nostr-tools';
 import fs from 'node:fs';
 import path from 'node:path';
 import WebSocket from 'ws';
-
-interface UserInfo {
-  id: string;
-  name?: string;
-  display_name?: string;
-  picture?: string;
-  npub: string;
-}
-
-interface UsersInfoData {
-  usersInfo: { [userId: string]: UserInfo };
-}
+import { UserInfo, UsersInfoData } from '../lib/types.js';
 
 const DATA_DIR = path.join(process.cwd(), 'src', 'data');
 const USERS_INFO_FILE = path.join(DATA_DIR, 'allowedUsersInfo.json');

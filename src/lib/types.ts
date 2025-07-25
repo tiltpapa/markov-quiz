@@ -31,3 +31,15 @@ declare global {
     nostr?: WindowNostr;
   }
 } 
+
+export interface UserInfo {
+  id: string;
+  name?: string;
+  display_name?: string;
+  picture?: string;
+  npub: string;
+}
+
+export interface UsersInfoData {
+  usersInfo: { [userId: string]: UserInfo };
+}
