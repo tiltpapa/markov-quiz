@@ -4,6 +4,7 @@
   import type { QuizAttempt } from '../../lib/storage';
   import { quizStorage } from '../../lib/storage';
   import EmojiText from './EmojiText.svelte';
+  import AnswerInput from './AnswerInput.svelte';
   import { SimplePool, type EventTemplate } from 'nostr-tools';
 
   export let quiz: QuizData;
@@ -197,42 +198,12 @@ https://tiltpapa.github.io/markov-quiz/
     </div>
 
     {#if !showCorrectResult && !showIncorrectResult}
-      <div class="bg-light border border-light-subtle rounded p-4">
-        <label for="answer" class="form-label fw-semibold text-dark mb-3">回答欄</label>
-        {#if quizAttempt && quizAttempt.attempts > 0}
-          <div class="alert alert-info mb-3">
-            挑戦回数: {quizAttempt.attempts}回
-          </div>
-        {/if}
-        <div class="input-group mb-3">
-          <input 
-            id="answer"
-            type="text" 
-            class="form-control form-control-lg"
-            bind:value={selectedAnswer}
-            on:keydown={(e) => e.key === 'Enter' && submitAnswer()}
-          />
-          <button 
-            class="btn btn-primary btn-lg px-4" 
-            type="button"
-            on:click={submitAnswer} 
-            disabled={!selectedAnswer.trim()}
-          >
-            こいつだ！
-          </button>
-        </div>
-        <div class="text-muted small">
-          回答フォーマット: 
-          {#if quiz.userInfo.name}name, {/if}
-          {#if quiz.userInfo.display_name}display_name, {/if}
-          公開鍵(npub, hex)
-        </div>
-        {#if !quiz.userInfo.name && !quiz.userInfo.display_name}
-          <div class="text-warning small mt-1">
-            プロフィール情報の取得に失敗しました
-          </div>
-        {/if}
-      </div>
+      <AnswerInput 
+        {quiz}
+        {quizAttempt}
+        bind:selectedAnswer
+        onSubmit={submitAnswer}
+      />
     {:else if showIncorrectResult}
       <div class="border border-warning border-2 rounded p-4 bg-warning bg-opacity-10">
         <h3 class="h5 text-warning mb-4">不正解</h3>
