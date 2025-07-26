@@ -101,5 +101,37 @@
     font-size: 1.25rem;
     color: #212529;
     background-color: #fff;
+    /* 最小幅を設定して縮小可能にする */
+    min-width: 120px;
+    flex-shrink: 1;
+  }
+
+  /* autocompleteライブラリのモバイル用幅固定を無効化 */
+  :global(.autoComplete_wrapper > input) {
+    width: 100% !important;
+  }
+
+  /* input-group内でのレスポンシブ対応 */
+  .input-group .autoComplete_wrapper {
+    flex: 1 1 auto;
+    display: flex;
+  }
+
+  .input-group .autoComplete_wrapper > input {
+    flex: 1 1 auto;
+    width: 100% !important;
+  }
+
+  /* input-groupの折り返し防止とサイズ調整 */
+  .input-group {
+    flex-wrap: nowrap !important;
+    min-width: 0;
+  }
+
+  /* ボタンの最小幅と縮小設定 */
+  .input-group .btn {
+    min-width: 80px;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
 </style>
