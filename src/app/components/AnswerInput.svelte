@@ -107,8 +107,10 @@
   }
 
   /* autocompleteライブラリのモバイル用幅固定を無効化 */
-  :global(.autoComplete_wrapper > input) {
-    width: 100% !important;
+  @media only screen and (max-width: 600px) {
+    :global(.autoComplete_wrapper > input) {
+      width: 100% !important;
+    }
   }
 
   /* input-group内でのレスポンシブ対応 */
