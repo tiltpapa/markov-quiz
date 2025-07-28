@@ -166,7 +166,7 @@
       "npub": "npub18zw2f9tezxcjvzflg2s2jpux29d4jvgack559dqy6lsk79eg0q5qggvaxw",
       "name": "♨︎",
       "display_name": "風呂屋",
-      "picture": "https://image.nostr.build/8e14ad9f67170350e35606d370dd7070cd04b3f5474e7f7321ef2b9e60e50cd9.jpg"
+      "picture": "https://image.nostr.build/74ab00a7114f5f72e38339d98811c0c3b7353743dd42fd2bf108a189e6170ed3.jpg"
     },
     "7232d725dbbab9c881b2a26af88fd651dd917362a70ec7d3018296c6a22ff54e": {
       "id": "7232d725dbbab9c881b2a26af88fd651dd917362a70ec7d3018296c6a22ff54e",
@@ -187,7 +187,7 @@
       "npub": "npub19we2h0793y4hhk500r2ndqkez0xf53rtghs3j20sjdwclh7tgz7s36kl6t",
       "name": "unyu",
       "display_name": "うにゅう",
-      "picture": "https://nikolat.github.io/avatar/unyu-11.png"
+      "picture": "https://nikolat.github.io/avatar/unyu-10.png"
     },
     "f987fb90696fcb09358629aeebf5156ea05a405101c4f2d9020bf02f47ea4a49": {
       "id": "f987fb90696fcb09358629aeebf5156ea05a405101c4f2d9020bf02f47ea4a49",
@@ -236,13 +236,6 @@
       "name": "lkjsxc",
       "display_name": "lkjsxc / スク",
       "picture": "https://raw.githubusercontent.com/lkjsxc/mono/refs/heads/main/media/icon_0512.png"
-    },
-    "7b73abe05caa0533e54770cd22203c032ee7c128502d2d54560f8e91a4985287": {
-      "id": "7b73abe05caa0533e54770cd22203c032ee7c128502d2d54560f8e91a4985287",
-      "npub": "npub10de6hczu4gzn8e28wrxjygpuqvhw0sfg2qkj64zkp78frfyc22rslyes37",
-      "name": "yukimikudayo",
-      "display_name": "雪乃みくだよ",
-      "picture": "https://image.nostr.build/aefbd12fd73b1ef78ff443db4e995d9df13654ed3bfa69a2d9115fbf44b3f2dc.png"
     }
   }
 }
