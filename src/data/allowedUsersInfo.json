@@ -11,7 +11,7 @@
       "id": "e62f27d2814a25171c466d2d7612ad1a066db1362b4e259db5c076f9e6b21cb7",
       "npub": "npub1uchj055pfgj3w8zxd5khvy4drgrxmvfk9d8zt8d4cpm0ne4jrjms30u6q9",
       "name": "uchijo",
-      "display_name": "うおーん",
+      "display_name": "3次会に行きたい",
       "picture": "https://www.uchijo.com/icon.jpg"
     },
     "b3e43e8cc7e6dff23a33d9213a3e912d895b1c3e4250240e0c99dbefe3068b5f": {
@@ -236,6 +236,13 @@
       "name": "lkjsxc",
       "display_name": "lkjsxc / スク",
       "picture": "https://raw.githubusercontent.com/lkjsxc/mono/refs/heads/main/media/icon_0512.png"
+    },
+    "274a2e86f1a7acb45b01f290284a343c248cb913677b43d7f7615b513194d8b0": {
+      "id": "274a2e86f1a7acb45b01f290284a343c248cb913677b43d7f7615b513194d8b0",
+      "npub": "npub1ya9zaph357ktgkcp72gzsj358sjgewgnvaa584lhv9d4zvv5mzcq67kj0m",
+      "name": "🧂",
+      "display_name": "しお",
+      "picture": "https://image.nostr.build/ae11732e3e5f2dec0504a4acdd1899968fbd9d44947db4d7953929510c510bf4.jpg"
     }
   }
 }
