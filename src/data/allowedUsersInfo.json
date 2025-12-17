@@ -68,7 +68,7 @@
       "npub": "npub1xgcsn9lkkdake4stk9dz36dpfwkam7lssad8mcjvdyfr5rq7vnxqq2sgy4",
       "name": "showV3",
       "display_name": "ひゅうが霄",
-      "picture": "https://showhyuga.pages.dev/nostricon/hyutegaki.jpg"
+      "picture": "https://showhyuga.pages.dev/nostricon/hyufig1.png"
     },
     "b7d6bcce4f4c423e75e945acafe414f105598d71c482428eb96cd031de707150": {
       "id": "b7d6bcce4f4c423e75e945acafe414f105598d71c482428eb96cd031de707150",
@@ -108,7 +108,7 @@
       "id": "f240c9c2510c3c63d3525ad11ed1307741d0dffecdeb3e5cd7da12396c0c0a86",
       "npub": "npub17fqvnsj3ps7x856jttg3a5fswaqaphl7eh4nuhxhmgfrjmqvp2rqrcuyff",
       "name": "ikanoasi10",
-      "display_name": "くゅ",
+      "display_name": "いけてるコンビニ",
       "picture": "https://image.nostr.build/85d831423749f4288d8492d3b0d55a53c098b10756a3a98e4d718ec0f89b3d85.jpg"
     },
     "ec42c765418b3db9c85abff3a88f4a3bbe57535eebbdc54522041fa5328c0600": {
@@ -320,8 +320,8 @@
     "6b6e19ce47a917cbe13a67eeb4053a9b301e78ec991413e7554953088ed62d3b": {
       "id": "6b6e19ce47a917cbe13a67eeb4053a9b301e78ec991413e7554953088ed62d3b",
       "npub": "npub1ddhpnnj84ytuhcf6vlhtgpf6nvcpu78vny2p8e64f9fs3rkk95ashxgr8s",
-      "name": "ぺぇ🐇（名前〜？）",
-      "display_name": "ぺぇ🐇（名前〜？）",
+      "name": "ぺぇ🐇（白湯ちゃん）",
+      "display_name": "ぺぇ🐇（白湯ちゃん）",
       "picture": "https://image.nostr.build/0a96aa909d8575f20c6a20c96bdb7306f6b0a2c959972d4380bc7fbe67054102.jpg"
     }
   }
