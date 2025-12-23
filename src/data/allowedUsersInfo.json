@@ -282,7 +282,7 @@
       "npub": "npub15ttxzgfcf2yr0xc0zcggdty5v58n388jgnryl5xjpykzex9mwcfsfpuj93",
       "name": "zitrus.haus",
       "display_name": "シトラス",
-      "picture": "https://statesch.zitrus.haus/images/citrus-box-trapped-800.svg"
+      "picture": "https://zitrus.haus?"
     },
     "df8f0a640c3ffd09e293999acfa399d0574c8501fcdabceca5072ee2057d87a5": {
       "id": "df8f0a640c3ffd09e293999acfa399d0574c8501fcdabceca5072ee2057d87a5",
@@ -320,8 +320,8 @@
     "6b6e19ce47a917cbe13a67eeb4053a9b301e78ec991413e7554953088ed62d3b": {
       "id": "6b6e19ce47a917cbe13a67eeb4053a9b301e78ec991413e7554953088ed62d3b",
       "npub": "npub1ddhpnnj84ytuhcf6vlhtgpf6nvcpu78vny2p8e64f9fs3rkk95ashxgr8s",
-      "name": "ぺぇ🐇（又茶漬け）",
-      "display_name": "ぺぇ🐇（又茶漬け）",
+      "name": "ぺぇ🐇（梅茶漬け）",
+      "display_name": "ぺぇ🐇（梅茶漬け）",
       "picture": "https://image.nostr.build/0a96aa909d8575f20c6a20c96bdb7306f6b0a2c959972d4380bc7fbe67054102.jpg"
     }
   }
